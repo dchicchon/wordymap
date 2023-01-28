@@ -3,8 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "reactProject": {
+    "ready": true,
+    "entry": "./src/index.jsx",
+    "name": "Wordymap",
+    "route": "/wordmap"
+  },
   "scripts": {
-    "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "buildWords": "node ./utils/createWords",

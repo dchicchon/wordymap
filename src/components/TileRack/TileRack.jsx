@@ -10,7 +10,7 @@ export const TileRack = ({ game, update }) => {
         drop: (item) => {
             // Checking if tile is in tilerack. If not, lets let it drop here
             if (isNaN(item.index)) {
-                console.log('Adding back to rack');
+                // console.log('Adding back to rack');
                 const tile = game.getTile(item.x, item.y)
                 game.addToTileRack(tile); // add to rack
                 game.removeTile(item.x, item.y) // remove from board

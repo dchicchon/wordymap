@@ -23,7 +23,6 @@ words.split('\n').forEach(word => {
 })
 // lets create an obj with the wordArr
 const wordStr = JSON.stringify(obj);
-// console.log(wordStr)
 const str = `
 export const wordObj = ${wordStr}
 `

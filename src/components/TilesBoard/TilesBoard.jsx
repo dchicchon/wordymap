@@ -1,6 +1,6 @@
 import { useDrop } from "react-dnd";
 import Tile from "../Tile";
-import "./TilesBoard.css";
+import styles from "./TilesBoard.module.css";
 
 export const TilesBoard = ({ game, update }) => {
   const buildTiles = () => {
@@ -14,7 +14,7 @@ export const TilesBoard = ({ game, update }) => {
         );
       }
       tiles.push(
-        <div key={y} className="row">
+        <div key={y} className={styles.row}>
           {row}
         </div>
       );
@@ -22,7 +22,7 @@ export const TilesBoard = ({ game, update }) => {
     return tiles;
   };
 
-  return <div id="tiles">{buildTiles()}</div>;
+  return <div id={styles.tiles}>{buildTiles()}</div>;
 };
 
 const TileSpace = ({ x, y, id, game, update }) => {
@@ -61,7 +61,7 @@ const TileSpace = ({ x, y, id, game, update }) => {
   };
 
   return (
-    <div id={id} ref={drop} className="tilespace">
+    <div id={id} ref={drop} className={styles.tilespace}>
       {isOver && canDrop && (
         <div
           style={{

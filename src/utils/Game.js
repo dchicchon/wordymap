@@ -26,7 +26,6 @@ const Alpha = {
  13: A
  18: E
  */
-// let alpha = Alpha.rs('E', 2).rs('S', 1).s();
 let alpha = Alpha.rs("E", 18)
   .rs("A", 13)
   .rs("I", 12)
@@ -83,7 +82,6 @@ class Game {
     if (!this.isValid(x, y)) {
       this.validNum += 1;
       this.validmap[y][x] = true;
-      console.log(`Valid Number: ${this.validNum}`);
     }
   }
 
@@ -91,15 +89,12 @@ class Game {
     if (this.isValid(x, y)) {
       if (this.validNum > 0) this.validNum -= 1;
       this.validmap[y][x] = false;
-      console.log(`Valid Number: ${this.validNum}`);
     }
   }
 
   // start check from this coordinate
   // words only valid going down or to the right
   wordCheck(x, y) {
-    console.log("WordCheck");
-
     const startX = x;
     const startY = y;
     const startingTile = this.tilemap[startY][startX]; // starting tile
@@ -168,13 +163,13 @@ class Game {
       const validWord = wordObj[word];
       if (validWord) {
         firstWordValid = true;
-        console.log("Valid word", word);
+        // console.log("Valid word", word);
         indicies.forEach((pos) => {
           // console.log('Set valid:', ...pos)
           this.setValid(...pos);
         });
       } else {
-        console.log("Not a valid word");
+        // console.log("Not a valid word");
         if (firstWordValid) indicies.shift(); // remove first index so we don't set it as invalid
         indicies.forEach((pos, i) => {
           // console.log('Remove valid:', ...pos)
@@ -184,8 +179,11 @@ class Game {
     });
 
     if (this.tiles.length === 0 && this.validNum === this.totalTiles) {
+      const copymap = JSON.parse(JSON.stringify(this.tilemap))
+      const count = this.clustercount(x, y, copymap)
+      if (count !== this.totalTiles) return;
       if (this.availableLetters.length === 0) {
-        console.log("You win!");
+        // console.log("You win!");
         return;
       }
       const newTile = this.getRandomTile();

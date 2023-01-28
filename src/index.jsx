@@ -1,14 +1,11 @@
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import Board from './components/Board'
-import './App.css'
+import styles from './index.module.css'
 
-function App() {
-
-  // we want to base our Board on the game instance. How should we observe the game?
-
+const App = () => {
   return (
-    <div className="App">
+    <div className={styles.App}>
       <DndProvider backend={HTML5Backend}>
         <Board />
       </DndProvider>
