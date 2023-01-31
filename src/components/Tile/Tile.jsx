@@ -30,7 +30,7 @@ export const Tile = ({ tile, index, x, y, valid, onMouseUp }) => {
     }
     if (valid) {
       return {
-        border: "1px solid green",
+        border: "1px solid lightgreen",
       };
     }
     return {

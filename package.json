@@ -6,8 +6,8 @@
   "reactProject": {
     "ready": true,
     "entry": "./src/index.jsx",
-    "name": "Wordymap",
-    "route": "/wordmap"
+    "title": "Wordymap",
+    "description": "A bananagram emulator"
   },
   "scripts": {
     "start": "vite",
