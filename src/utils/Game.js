@@ -58,6 +58,7 @@ class Game {
 
   reset() {
     // reset the game
+    this.tiles = [];
     this.points = 0;
     this.setup();
   }
@@ -183,7 +184,7 @@ class Game {
       const count = this.clustercount(x, y, copymap)
       if (count !== this.totalTiles) return;
       if (this.availableLetters.length === 0) {
-        // console.log("You win!");
+        console.log("You win!");
         return;
       }
       const newTile = this.getRandomTile();

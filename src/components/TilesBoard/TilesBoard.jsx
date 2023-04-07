@@ -22,7 +22,11 @@ export const TilesBoard = ({ game, update }) => {
     return tiles;
   };
 
-  return <div id={styles.tiles}>{buildTiles()}</div>;
+  return (
+    // <div style={{overflow: 'clip'}}>
+    <div id={styles.tiles}>{buildTiles()}</div>
+    // </div>
+  );
 };
 
 const TileSpace = ({ x, y, id, game, update }) => {
