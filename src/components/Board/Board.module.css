@@ -1,22 +1,19 @@
 .board {
   border: 1px solid rgb(251, 145, 6);
   border-radius: 5%;
-  overflow:hidden;
-  width: 50%;
+  overflow: hidden;
   position: absolute;
+  width: 50%;
   height: 75%;
-  /* padding: 20px; */
+  /* margin: 10px; */
   display: flex;
   flex-direction: column;
   color: white;
 }
 
-.mobileBoard {
-  width: 100%;
-  position: relative;
-  border: 1px solid rgb(251, 145, 6);
-  display: flex;
-  flex-direction: column;
-  height: 80%;
-  color: white;
+@media screen and (max-width: 600px) {
+  .board {
+    border-radius: 0;
+    width: 99%;
+  }
 }

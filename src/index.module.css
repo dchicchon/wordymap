@@ -5,6 +5,7 @@ body {
 .App {
   display: flex;
   height: 100%;
+  /* min-height: 75vh; */
   width: 100%;
   justify-content: center;
   /* align-items: center; */

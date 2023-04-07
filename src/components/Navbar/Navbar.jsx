@@ -16,9 +16,9 @@ const Navbar = ({ game, resetGame, gameNum }) => {
 
     return (
         <div className={styles.navbar}>
-            <h4>Wordymap</h4>
-            <h4>Time: {time}</h4>
-            <h4>Tiles Left: {game.availableLetters.length + game.tiles.length}</h4>
+            <h4 className={styles.nav_element}>Wordymap</h4>
+            <h4 className={styles.nav_element}>Time: {time}</h4>
+            <h4 className={styles.nav_element}>Tiles Left: {game.availableLetters.length + game.tiles.length}</h4>
             <button onClick={resetGame} className={styles.button}>
                 Reset Game
             </button>
