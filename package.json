@@ -3,12 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "reactProject": {
-    "ready": true,
-    "entry": "./src/index.jsx",
-    "title": "Wordymap",
-    "description": "A bananagram emulator"
-  },
   "scripts": {
     "start": "vite",
     "build": "vite build",
