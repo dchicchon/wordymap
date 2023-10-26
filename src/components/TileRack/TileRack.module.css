@@ -26,10 +26,17 @@
 
 /* the size of this should be based on the screen width */
 /* maybe we should do the same thing for our tileboard */
+
 .tile {
   width: calc(100vw / 32);
   height: calc(100vw / 32);
-  /* padding: 5px; */
+}
+
+@media screen and (max-width: 600px) {
+  .tile {
+    width: calc(100vw / 10);
+    height: calc(100vw / 10);
+  }
 }
 
 @keyframes fadein {
@@ -54,10 +61,4 @@
   border-radius: 10px;
   background: rgb(166, 166, 166);
   -webkit-box-shadow: inset 0 0 6px gray;
-}
-
-@media screen and (max-width: 600px) {
-  #tilerack {
-    justify-content: flex-start;
-  }
 }

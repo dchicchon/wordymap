@@ -23,31 +23,17 @@ const borderStyles = {
   },
 };
 
-// remove DND and just use click
 export const Tile = ({ tile }) => {
-  // check for valid
-  // check for selected
-
-  // lets just subscribe to the currently selected letter
-  // if it's the case that it's the same id, then we highlight it?
   const selectedTile = useStore((state) => state.selectedTile);
-  // const setSelectedTile = useStore((state) => state.setSelectedTile);
   const [border, setBorder] = useState(false);
 
   useEffect(() => {
-    // const unsub = useStore.subscribe(
-    //   (state) => state.selectedTile,
-    //   (selectedTile) => {
-    //     console.log('selectedTile changed');
-    //   }
-    // );
-    // console.log('selected tile changed');
-    // check if the selectedTile id is the same as this id
+    // Consider using zustand subscriptions for this instead
     if (selectedTile && selectedTile.id === tile.id) {
       setBorder('selected');
     } else if (tile.valid) {
       setBorder('valid');
-    } else if (tile.letter) {
+    } else if (tile.id) {
       setBorder('default');
     } else {
       setBorder('noLetter');

@@ -53,8 +53,9 @@ let alpha = Alpha.rs('E', 18)
   .rs('JKQXZ', 2)
   .s();
 
-// maybe we should migrate the game here?
 const initialGame = new Game();
+// now we basically only use the game class to init
+// we need to bring more game logic now?
 
 export const useStore = create(
   subscribeWithSelector((set) => ({
@@ -74,10 +75,10 @@ export const useStore = create(
       }),
     removeFromTileRack: (selectedIndex) =>
       set((state) => {
-        console.log({ selectedIndex });
         state.tilerack.splice(selectedIndex, 1);
         return {
           tilerack: state.tilerack,
+          tilemapNum: state.tilemapNum + 1,
         };
       }),
     addToTileRack: (tile) =>
@@ -89,15 +90,12 @@ export const useStore = create(
       }),
     setTileRack: (rack) =>
       set((state) => {
-        console.log({ rack });
-        // we should be updating our game directly through here
         return {
           tilerack: rack,
         };
       }),
     setTileMap: (map) =>
       set((state) => {
-        console.log({ map });
         return {
           tilemap: map,
         };
@@ -118,7 +116,6 @@ export const useStore = create(
       }),
     setSelectedTile: (tile) =>
       set(() => {
-        console.log({ selectedTile: tile });
         return { selectedTile: tile };
       }),
     removeTileFromMap: (tile) =>

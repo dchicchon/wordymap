@@ -16,12 +16,10 @@ export const TileRack = () => {
   }, []);
 
   const onClick = (pressedTile) => {
-    // lets add the index to the tile when we click it
     const selectedTile = {
       index: tilerack.findIndex((tile) => tile.id === pressedTile.id),
       ...pressedTile,
     };
-    console.log({ selectedTileFromRack: selectedTile });
     setSelectedTile(selectedTile);
   };
 

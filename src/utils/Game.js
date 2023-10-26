@@ -341,7 +341,6 @@ class Game {
   removeTile(x, y) {
     console.log('remove tile');
     console.log({ x, y })
- 
     this.tilemap[y][x] = emptyTile;
     // this.removeValid(x, y);
     // const validAdjecentTiles = this.getValidAdjecentTiles(x, y); // checking for valid adjecent tiles
@@ -351,10 +350,6 @@ class Game {
     //   });
     // }
   }
-
-
-
-
 
   addToTileRack(tile) {
     console.log('addToTileRack');

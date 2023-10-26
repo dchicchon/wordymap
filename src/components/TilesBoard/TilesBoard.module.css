@@ -42,23 +42,20 @@
  same size of the tile so style doesn't look weird when placing
 */
 .tile {
-  /* box-sizing: border-box; */
   color: white;
   width: calc(100vw / 32);
   height: calc(100vw / 32);
   padding: 5px;
-  /* display: inline-block; */
-  /* height: 30px; */
-  /* width: 3vw; */
-  /* min-width: 30px; */
-  /* flex-grow: 1; */
-  /* text-align: center; */
-  /* should we calculate the height */
-  /* height: 3vw; */
-  /* min-height: 35px; */
   background-color: #1a1a1a;
   border: 0.1px solid rgb(133, 133, 133);
-  transition: background-color 0.25s
+  transition: background-color 0.25s;
+}
+
+@media screen and (max-width: 600px) {
+  .tile {
+    width: calc(100vw / 10);
+    height: calc(100vw / 10);
+  }
 }
 
 .tile:hover {
