@@ -1,9 +1,10 @@
 #tiles {
-  flex: 3;
-  overflow-y: scroll;
-  overflow-x: scroll;
-  font-size: 0;
+  /* flex: 3; */
+  /* overflow-y: scroll; */
+  /* overflow-x: scroll; */
   /* position: absolute; */
+  /* width: 100vw; */
+  font-size: 0;
   display: flex;
   flex-direction: column;
   border: 0.1px solid rgb(133, 133, 133);
@@ -33,13 +34,35 @@
 }
 
 .row {
+  /* width: 100vw; */
   display: flex;
 }
 
-.tilespace {
+/* we should make all the tilespaces the
+ same size of the tile so style doesn't look weird when placing
+*/
+.tile {
+  /* box-sizing: border-box; */
   color: white;
-  flex-grow: 1;
-  text-align: center;
-  min-height: 35px;
+  width: calc(100vw / 32);
+  height: calc(100vw / 32);
+  padding: 5px;
+  /* display: inline-block; */
+  /* height: 30px; */
+  /* width: 3vw; */
+  /* min-width: 30px; */
+  /* flex-grow: 1; */
+  /* text-align: center; */
+  /* should we calculate the height */
+  /* height: 3vw; */
+  /* min-height: 35px; */
+  background-color: #1a1a1a;
   border: 0.1px solid rgb(133, 133, 133);
+  transition: background 0.1s border 0.1s;
 }
+
+/* .tilespace:hover {
+  cursor: pointer;
+  background-color: #3a3a3a;
+  border: 2px solid rgb(174, 172, 62);
+} */

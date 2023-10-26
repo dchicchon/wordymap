@@ -4,11 +4,9 @@ body {
 
 .App {
   display: flex;
-  height: 100%;
-  /* min-height: 75vh; */
+  /* height: 100%; */
   width: 100%;
-  justify-content: center;
-  /* align-items: center; */
+  color: white;
   background-color: #1a1a1a;
 }
 
@@ -22,4 +20,21 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+}
+
+.board {
+  /* border: 1px solid rgb(251, 145, 6); */
+  /* border-radius: 5%; */
+  /* overflow: hidden; */
+  /* position: absolute; */
+  /* width: 50%; */
+  /* height: 75%; */
+  /* margin: 10px; */
+}
+
+@media screen and (max-width: 600px) {
+  .board {
+    border-radius: 0;
+    width: 99%;
+  }
 }

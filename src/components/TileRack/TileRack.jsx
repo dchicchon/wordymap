@@ -1,43 +1,40 @@
+import { useEffect, useState } from 'react';
+import Tile from '../Tile';
+import { useStore } from '../../utils/store';
+import styles from './TileRack.module.css';
 
-import { useDrop } from 'react-dnd'
-import Tile from '../Tile'
-import './TileRack.css'
+export const TileRack = () => {
+  const tilerack = useStore((state) => state.tilerack);
+  const setSelectedTile = useStore((state) => state.setSelectedTile);
+  const [rack, setRack] = useState([]);
+  useEffect(() => {
+    setRack(buildRack(tilerack));
+    const unsubscribe = useStore.subscribe((state) => {
+      setRack(buildRack(state.tilerack));
+    });
+    return unsubscribe;
+  }, []);
 
-export const TileRack = ({ game, update }) => {
+  const onClick = (selectedTile) => {
+    setSelectedTile(selectedTile);
+  };
 
-    const [{ isOver, canDrop }, drop] = useDrop(() => ({
-        accept: 'tile',
-        drop: (item) => {
-            // Checking if tile is in tilerack. If not, lets let it drop here
-            if (isNaN(item.index)) {
-                // console.log('Adding back to rack');
-                const tile = game.getTile(item.x, item.y)
-                game.addToTileRack(tile); // add to rack
-                game.removeTile(item.x, item.y) // remove from board
-            }
-        },
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver(),
-            canDrop: !!monitor.canDrop(),
-        })
-    }), [game])
-
-    const buildRack = () => {
-        const rack = []
-        for (let i = 0; i < game.tiles.length; i++) {
-            const tile = game.tiles[i]
-            rack.push(<Tile update={update} key={i} index={i} tile={tile} />);
-        }
-        return rack;
-    }
-
-    return (
-        <div id='tilerack-wrapper'>
-            <div id='tilerack' style={{
-                backgroundColor: isOver && canDrop ? '#353535' : ''
-            }} ref={drop}>
-                {buildRack()}
-            </div>
+  const buildRack = (newRack) => {
+    const rack = [];
+    for (let i = 0; i < newRack.length; i++) {
+      const tile = newRack[i];
+      rack.push(
+        <div className={styles.tile} onClick={() => onClick(tile)} key={i}>
+          <Tile tile={tile} />
         </div>
-    )
-}
+      );
+    }
+    return rack;
+  };
+
+  return (
+    <div id={styles.wrapper}>
+      <div id={styles.rack}>{rack}</div>
+    </div>
+  );
+};

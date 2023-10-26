@@ -1,16 +1,23 @@
 .navbar {
-  /* margin: 10px; */
+  position: fixed;
+  z-index: 1;
+  top: 0; /* Stick to the top of the page */
+  left: 0;
+  width: 100%; /* Full width */
+  /* height: 50px; */
   padding: 10px;
   display: flex;
-  gap: 5px;
+  justify-content: space-around;
+  border-bottom: 1px solid white;
+  background-color: #242424;
 }
 
 .nav_element {
   margin: 0;
-  flex: 0 0 90px;
+  /* flex: 0 0 90px; */
 }
 .button {
-  padding: 5px;
+  padding: 1px;
   color: white;
   border: 1px solid orange;
 }

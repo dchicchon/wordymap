@@ -1,4 +1,5 @@
 import { wordObj } from "./words.js";
+import { nanoid } from "nanoid";
 
 const Alpha = {
   alpha: "",
@@ -41,12 +42,12 @@ let alpha = Alpha.rs("E", 18)
 
 class Game {
   constructor() {
+    // store game data in 
     this.availableLetters = alpha.slice();
     this.totalTiles = 0;
     this.validNum = 0;
     this.tiles = [];
     this.tilemap = [];
-    this.validmap = [];
     this.size = 32;
     this.setup();
   }
@@ -56,40 +57,64 @@ class Game {
     this.setupTileRack();
   }
 
-  reset() {
-    // reset the game
-    this.tiles = [];
-    this.points = 0;
-    this.setup();
-  }
+  // reset() {
+  //   // reset the game
+  //   this.tiles = [];
+  //   this.points = 0;
+  //   this.setup();
+  // }
 
   buildMaps() {
-    for (let i = 0; i < this.size; i++) {
-      this.tilemap[i] = [];
-      this.validmap[i] = [];
-      for (let j = 0; j < this.size; j++) {
-        this.tilemap[i][j] = "";
-        this.validmap[i][j] = false;
+    console.log('buildMaps');
+    for (let y = 0; y < this.size; y++) {
+      this.tilemap[y] = [];
+      // this.validmap[y] = [];
+      for (let x = 0; x < this.size; x++) {
+        const emptyTile = {
+          letter: '',
+          valid: false,
+          index: null,
+          x,
+          y
+        }
+        this.tilemap[y][x] = emptyTile
       }
+    }
+  }
+  setupTileRack() {
+    console.log('setupTileRack');
+    for (let i = 0; i < 21; i++) {
+      this.totalTiles += 1;
+      const letter = this.getRandomLetter();
+      const tile = {
+        id: nanoid(),
+        index: i,
+        x: null,
+        y: null,
+        letter
+      }
+      this.tiles.push(tile);
     }
   }
 
   // read the validmap and look for bool
   isValid(x, y) {
-    return this.validmap[y][x];
+    return this.tilemap[y][x].valid;
   }
 
   setValid(x, y) {
     if (!this.isValid(x, y)) {
       this.validNum += 1;
-      this.validmap[y][x] = true;
+      this.tilemap[y][x].valid = true;
     }
   }
 
   removeValid(x, y) {
     if (this.isValid(x, y)) {
       if (this.validNum > 0) this.validNum -= 1;
-      this.validmap[y][x] = false;
+      // this.validmap[y][x] = false;
+      this.tilemap[y][x].valid = false;
+
     }
   }
 
@@ -121,15 +146,15 @@ class Game {
     };
 
     const insertMap = {
-      [BEHIND]: (tile, word) => tile.concat(word),
-      [AHEAD]: (tile, word) => word.concat(tile),
+      [BEHIND]: (letter, word) => letter.concat(word),
+      [AHEAD]: (letter, word) => word.concat(letter),
     };
 
     let firstWordValid = false;
 
     // Go through x or y
     Object.keys(look).forEach((lookKey) => {
-      let word = startingTile; // add to the front or back of this word while we go
+      let word = startingTile.letter; // add to the front or back of this word while we go
       const orientation = look[lookKey];
       const indicies = [];
       const startIndex = [startX, startY];
@@ -158,27 +183,24 @@ class Game {
           const newIndex = [currentX, currentY]; // push position of this tile for later
           indicies.push(newIndex);
 
-          word = insert(newTile, word);
+          word = insert(newTile.letter, word);
         }
       });
       const validWord = wordObj[word];
       if (validWord) {
         firstWordValid = true;
-        // console.log("Valid word", word);
         indicies.forEach((pos) => {
-          // console.log('Set valid:', ...pos)
           this.setValid(...pos);
         });
       } else {
-        // console.log("Not a valid word");
         if (firstWordValid) indicies.shift(); // remove first index so we don't set it as invalid
         indicies.forEach((pos, i) => {
-          // console.log('Remove valid:', ...pos)
           this.removeValid(...pos);
         });
       }
     });
 
+    // we're checking if we should add a new letter
     if (this.tiles.length === 0 && this.validNum === this.totalTiles) {
       const copymap = JSON.parse(JSON.stringify(this.tilemap))
       const count = this.clustercount(x, y, copymap)
@@ -187,8 +209,16 @@ class Game {
         console.log("You win!");
         return;
       }
-      const newTile = this.getRandomTile();
-      this.addToTileRack(newTile);
+      // const newTile = this.getRandomLetter();
+      const newTile = {
+        x: null,
+        y: null,
+        valid: false,
+        index: this.tiles.length,
+        letter: this.getRandomLetter()
+      }
+      this.tiles.push(newTIle);
+      // this.addToTileRack(newTile);
       this.totalTiles += 1;
     }
   }
@@ -257,23 +287,31 @@ class Game {
    * @param {Number} y
    * @param {Number} index
    */
-  placeTile(x, y, index) {
-    const tile = this.tiles[index];
-    const current = this.getTile(x, y);
-    this.setTile(x, y, tile);
-    this.removeFromTileRack(index);
+  // placeTile(x, y, tile) {
+  //   // here we're placing the tile
 
-    // if theres a tile already there, we should bring it back to the rack
-    if (current) {
-      this.addToTileRack(current);
-    }
+  //   const tile = this.tiles[index];
 
-    this.wordCheck(x, y);
-  }
+  //   const current = this.getTile(x, y);
+  //   this.setTile(x, y, tile);
+
+  //   this.removeFromTileRack(tile.index);
+
+  //   // if theres a tile already there, we should bring it back to the rack
+  //   if (current) {
+  //     this.addToTileRack(current);
+  //   }
+
+  //   this.wordCheck(x, y);
+  // }
 
   // set a tile on a space
   setTile(x, y, tile) {
+    console.log('setTile');
+    tile.x = x;
+    tile.y = y;
     this.tilemap[y][x] = tile;
+
   }
 
   // anytime we move a tile, we should always do a word check
@@ -301,17 +339,26 @@ class Game {
   }
   // anytime we remove a tile from the board, check the adjecent tiles
   removeTile(x, y) {
-    this.tilemap[y][x] = "";
-    this.removeValid(x, y);
-    const validAdjecentTiles = this.getValidAdjecentTiles(x, y); // checking for valid adjecent tiles
-    if (validAdjecentTiles.length > 0) {
-      validAdjecentTiles.forEach((tile) => {
-        this.wordCheck(...tile);
-      });
+    console.log('remove tile');
+    console.log({ x, y })
+    const emptyTile = {
+      letter: '',
+      valid: false,
+      index: null,
+      x,
+      y
     }
+    this.tilemap[y][x] = emptyTile;
+    // this.removeValid(x, y);
+    // const validAdjecentTiles = this.getValidAdjecentTiles(x, y); // checking for valid adjecent tiles
+    // if (validAdjecentTiles.length > 0) {
+    //   validAdjecentTiles.forEach((tile) => {
+    //     this.wordCheck(...tile);
+    //   });
+    // }
   }
 
-  getRandomTile() {
+  getRandomLetter() {
     const index = Math.floor(Math.random() * this.availableLetters.length);
     const char = this.availableLetters[index];
     const firstHalf = this.availableLetters.slice(0, index);
@@ -320,21 +367,21 @@ class Game {
     return char;
   }
 
-  setupTileRack() {
-    // start with 21 tiles
-    for (let i = 0; i < 21; i++) {
-      this.totalTiles += 1;
-      const letter = this.getRandomTile();
-      this.addToTileRack(letter);
-    }
-  }
+
 
   addToTileRack(tile) {
+    console.log('addToTileRack');
     this.tiles.push(tile);
   }
 
   removeFromTileRack(index) {
-    this.tiles.splice(index, 1);
+    console.log('removeFromTileRack');
+    console.log(this.tiles.length);
+    this.tiles = this.tiles.filter((_, i) => {
+      console.log({ index, i })
+      return i !== index
+    })
+    console.log(this.tiles.length);
   }
 }
 

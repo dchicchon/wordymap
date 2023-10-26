@@ -1,22 +1,44 @@
-#tilerack-wrapper {
-  /* position: absolute; */
+#wrapper {
+  position: fixed;
+  bottom: 0; /* Stick to the top of the page */
+  left: 0;
+  width: 100%; /* Full width */
   /* bottom: 0px; */
   /* border: 1px solid white; */
   /* width: 100%; */
   /* height: 10%; */
 }
 
-#tilerack {
+#rack {
   flex: 1;
   display: flex;
   white-space: nowrap;
   overflow-x: auto;
   background-color: #242424;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border: 1px solid white;
+  gap: 15px;
+  padding: 10px;
+  border-top: 1px solid white;
   transition: background-color 0.5s;
+  min-height: 50px;
+  animation: fadein 1s;
+}
+
+/* the size of this should be based on the screen width */
+/* maybe we should do the same thing for our tileboard */
+.tile {
+  width: calc(100vw / 32);
+  height: calc(100vw / 32);
+  /* padding: 5px; */
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 #tilerack::-webkit-scrollbar {
