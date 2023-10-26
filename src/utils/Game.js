@@ -1,10 +1,10 @@
-import { wordObj } from "./words.js";
-import { nanoid } from "nanoid";
+// import { wordObj } from "./words.js";
+import { nanoid } from 'nanoid';
 
 const Alpha = {
-  alpha: "",
+  alpha: '',
   rs: function (char, num) {
-    const str = "".concat(char).repeat(num);
+    const str = ''.concat(char).repeat(num);
     this.alpha = this.alpha.concat(str);
     return this;
   },
@@ -27,76 +27,72 @@ const Alpha = {
  13: A
  18: E
  */
-let alpha = Alpha.rs("E", 18)
-  .rs("A", 13)
-  .rs("I", 12)
-  .rs("O", 11)
-  .rs("TR", 9)
-  .rs("N", 8)
-  .rs("DSU", 6)
-  .rs("L", 5)
-  .rs("G", 4)
-  .rs("BCFHMPVWY", 3)
-  .rs("JKQXZ", 2)
+let alpha = Alpha.rs('E', 18)
+  .rs('A', 13)
+  .rs('I', 12)
+  .rs('O', 11)
+  .rs('TR', 9)
+  .rs('N', 8)
+  .rs('DSU', 6)
+  .rs('L', 5)
+  .rs('G', 4)
+  .rs('BCFHMPVWY', 3)
+  .rs('JKQXZ', 2)
   .s();
-
 class Game {
   constructor() {
     // store game data in 
     this.availableLetters = alpha.slice();
     this.totalTiles = 0;
     this.validNum = 0;
-    this.tiles = [];
-    this.tilemap = [];
     this.size = 32;
-    this.setup();
+    this.tilerack = this.buildRack();
+    this.tilemap = this.buildMaps();
   }
 
-  setup() {
-    this.buildMaps();
-    this.setupTileRack();
-  }
-
-  // reset() {
-  //   // reset the game
-  //   this.tiles = [];
-  //   this.points = 0;
-  //   this.setup();
-  // }
 
   buildMaps() {
     console.log('buildMaps');
+    const map = [];
     for (let y = 0; y < this.size; y++) {
-      this.tilemap[y] = [];
-      // this.validmap[y] = [];
+      map[y] = [];
       for (let x = 0; x < this.size; x++) {
         const emptyTile = {
           letter: '',
           valid: false,
           index: null,
           x,
-          y
-        }
-        this.tilemap[y][x] = emptyTile
+          y,
+        };
+        map[y][x] = emptyTile;
       }
     }
+    return map;
   }
-  setupTileRack() {
+  buildRack() {
     console.log('setupTileRack');
+    const rack = []
     for (let i = 0; i < 21; i++) {
       this.totalTiles += 1;
       const letter = this.getRandomLetter();
       const tile = {
         id: nanoid(),
-        index: i,
         x: null,
         y: null,
-        letter
-      }
-      this.tiles.push(tile);
+        letter,
+      };
+      rack.push(tile);
     }
+    return rack;
   }
-
+  getRandomLetter() {
+    const index = Math.floor(Math.random() * this.availableLetters.length);
+    const char = this.availableLetters[index];
+    const firstHalf = this.availableLetters.slice(0, index);
+    const secondHalf = this.availableLetters.slice(index + 1);
+    this.availableLetters = firstHalf.concat(secondHalf);
+    return char;
+  }
   // read the validmap and look for bool
   isValid(x, y) {
     return this.tilemap[y][x].valid;
@@ -306,13 +302,17 @@ class Game {
   // }
 
   // set a tile on a space
-  setTile(x, y, tile) {
-    console.log('setTile');
-    tile.x = x;
-    tile.y = y;
-    this.tilemap[y][x] = tile;
+  // setTile(x, y, tile) {
+  //   const newTile = {
+  //     ...tile,
+  //     index: null,
+  //     x: x,
+  //     y: y,
+  //   }
+  //   console.log('setTile');
+  //   this.tilemap[y][x] = newTile;
 
-  }
+  // }
 
   // anytime we move a tile, we should always do a word check
   moveTile(x1, y1, x2, y2) {
@@ -341,13 +341,7 @@ class Game {
   removeTile(x, y) {
     console.log('remove tile');
     console.log({ x, y })
-    const emptyTile = {
-      letter: '',
-      valid: false,
-      index: null,
-      x,
-      y
-    }
+ 
     this.tilemap[y][x] = emptyTile;
     // this.removeValid(x, y);
     // const validAdjecentTiles = this.getValidAdjecentTiles(x, y); // checking for valid adjecent tiles
@@ -358,14 +352,7 @@ class Game {
     // }
   }
 
-  getRandomLetter() {
-    const index = Math.floor(Math.random() * this.availableLetters.length);
-    const char = this.availableLetters[index];
-    const firstHalf = this.availableLetters.slice(0, index);
-    const secondHalf = this.availableLetters.slice(index + 1);
-    this.availableLetters = firstHalf.concat(secondHalf);
-    return char;
-  }
+
 
 
 
@@ -375,13 +362,12 @@ class Game {
   }
 
   removeFromTileRack(index) {
-    console.log('removeFromTileRack');
-    console.log(this.tiles.length);
+    console.log({ index })
+    // console.log('removeFromTileRack');
     this.tiles = this.tiles.filter((_, i) => {
-      console.log({ index, i })
       return i !== index
     })
-    console.log(this.tiles.length);
+    // console.log(this.tiles.length);
   }
 }
 

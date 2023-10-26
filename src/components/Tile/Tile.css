@@ -9,11 +9,8 @@
   line-height: 40px;
   /* padding: 5px; */
   /* min-width: 30px; */
-  background-color: #1b1b1b;
-  transition: background-color 0.25s;
+  /* background-color: #1b1b1b; */
 }
 
 
-.tile:hover {
-  background-color: #292828;
-}
+

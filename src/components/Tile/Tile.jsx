@@ -35,6 +35,13 @@ export const Tile = ({ tile }) => {
   const [border, setBorder] = useState(false);
 
   useEffect(() => {
+    // const unsub = useStore.subscribe(
+    //   (state) => state.selectedTile,
+    //   (selectedTile) => {
+    //     console.log('selectedTile changed');
+    //   }
+    // );
+    // console.log('selected tile changed');
     // check if the selectedTile id is the same as this id
     if (selectedTile && selectedTile.id === tile.id) {
       setBorder('selected');
