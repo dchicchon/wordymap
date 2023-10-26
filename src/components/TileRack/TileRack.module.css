@@ -28,6 +28,7 @@
 /* maybe we should do the same thing for our tileboard */
 
 .tile {
+  user-select: none;
   width: calc(100vw / 32);
   height: calc(100vw / 32);
 }

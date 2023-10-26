@@ -46,28 +46,35 @@ class Game {
     this.totalTiles = 0;
     this.validNum = 0;
     this.size = 32;
-    this.tilerack = this.buildRack();
-    this.tilemap = this.buildMaps();
+    this.tilerack = [];
+    this.tilemap = [];
+    this.validmap = [];
+    this.setup();
+    // this.tilerack = this.buildRack();
+    // this.tilemap = this.buildMaps();
+  }
+
+  setup() {
+    this.buildRack()
+    this.buildTileMap();
+    this.buildValidMap();
   }
 
 
-  buildMaps() {
-    console.log('buildMaps');
+  buildTileMap() {
     const map = [];
     for (let y = 0; y < this.size; y++) {
       map[y] = [];
       for (let x = 0; x < this.size; x++) {
         const emptyTile = {
           letter: '',
-          valid: false,
-          index: null,
           x,
           y,
         };
         map[y][x] = emptyTile;
       }
     }
-    return map;
+    this.tilemap = map;
   }
   buildRack() {
     console.log('setupTileRack');
@@ -83,7 +90,17 @@ class Game {
       };
       rack.push(tile);
     }
-    return rack;
+    this.tilerack = rack;
+  }
+  buildValidMap() {
+    const map = []
+    for (let y = 0; y < this.size; y++) {
+      map[y] = [];
+      for (let x = 0; x < this.size; x++) {
+        map[y][x] = 0;
+      }
+    }
+    this.validmap = map;
   }
   getRandomLetter() {
     const index = Math.floor(Math.random() * this.availableLetters.length);
@@ -155,7 +172,6 @@ class Game {
       const indicies = [];
       const startIndex = [startX, startY];
       indicies.push(startIndex);
-      // Go left to right || up to down
       Object.keys(orientation).forEach((orientationKey) => {
         let insertPos = orientation[orientationKey];
         const update = updateMap[insertPos];
@@ -240,9 +256,7 @@ class Game {
   }
 
   inBounds(x, y) {
-    if (x < 0 || x >= this.size.length) return false;
-    if (y < 0 || y >= this.size.length) return false;
-    return true;
+
   }
 
   getValidAdjecentTiles(x, y, map) {

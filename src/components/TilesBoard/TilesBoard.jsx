@@ -11,6 +11,7 @@ export const TilesBoard = ({}) => {
   const setSelectedTile = useStore((state) => state.setSelectedTile);
   const removeFromTileRack = useStore((state) => state.removeFromTileRack);
   const removeTileFromMap = useStore((state) => state.removeTileFromMap);
+  const addToTileRack = useStore((state) => state.addToTileRack);
   const onClick = (currentTile) => {
     if (selectedTile) {
       if (selectedTile.id === currentTile.id) {
@@ -18,17 +19,18 @@ export const TilesBoard = ({}) => {
         setSelectedTile(null);
         return;
       } else {
-
       }
-      setTile(currentTile.x, currentTile.y, selectedTile);
       if (selectedTile.index === 0 || selectedTile.index) {
         removeFromTileRack(selectedTile.index);
+        delete selectedTile.index;
+        if (currentTile.id) {
+          addToTileRack(currentTile);
+        }
       }
       if (selectedTile.x && selectedTile.y) {
         setTile(selectedTile.x, selectedTile.y, currentTile);
       }
-
-      // finally select null
+      setTile(currentTile.x, currentTile.y, selectedTile);
       setSelectedTile(null);
     } else if (currentTile.id) {
       setSelectedTile(currentTile);
@@ -63,7 +65,9 @@ export const TilesBoard = ({}) => {
       centerZoomedOut={false}
       initialScale={1.25}
     >
-      <TransformComponent>{buildTileRows()}</TransformComponent>
+      <TransformComponent>
+        <div>{buildTileRows()}</div>
+      </TransformComponent>
     </TransformWrapper>
   );
 };

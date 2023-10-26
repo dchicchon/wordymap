@@ -16,8 +16,9 @@ export const TileRack = () => {
   }, []);
 
   const onClick = (pressedTile) => {
+    const index = tilerack.findIndex((tile) => tile.id === pressedTile.id);
     const selectedTile = {
-      index: tilerack.findIndex((tile) => tile.id === pressedTile.id),
+      index,
       ...pressedTile,
     };
     setSelectedTile(selectedTile);

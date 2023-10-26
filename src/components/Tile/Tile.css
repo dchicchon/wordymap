@@ -6,9 +6,10 @@
   height: inherit;
   width: inherit;
   text-align: center;
-  line-height: 40px;
+  min-width: 30px;
+  min-height: 30px;
+  /* line-height: 45px; */
   /* padding: 5px; */
-  /* min-width: 30px; */
   /* background-color: #1b1b1b; */
 }
 
