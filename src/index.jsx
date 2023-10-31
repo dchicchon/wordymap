@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 
 const App = () => {
   useEffect(() => {
+    console.log('hello from ios')
     console.log(window.innerWidth);
     // const cellWidth = window.innerWidth / 32;
     // console.log({ cellWidth });
