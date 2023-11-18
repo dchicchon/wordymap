@@ -343,6 +343,7 @@ class Game {
 
     if (secondTile) {
       this.wordCheck(x1, y1); // check the first position with the new tile
+      
     } else {
       const validAdjectTiles = this.getValidAdjecentTiles(x1, y1);
       validAdjectTiles.forEach((coord) => {

@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import Game from './Game';
 
+
+// we will create a word object but only words in 3 letters in 
+// length will count
 const wordObj = {
   HELLO: true,
   AT: true,
@@ -67,7 +70,7 @@ function inBounds(x, y, map) {
   return true;
 }
 
-const wordCheck = (x, y, tilemap, validmap) => {
+function wordCheck(x, y, tilemap, validmap) {
   const startX = x;
   const startY = y;
   const startingTile = tilemap[startY][startX]; // starting tile
@@ -178,7 +181,52 @@ const wordCheck = (x, y, tilemap, validmap) => {
   //   this.totalTiles += 1;
   // }
   return { tilemap, validmap };
-};
+}
+
+// counting full system
+function clusterCount(x, y, map, memo = { sum: 0 }) {}
+
+// get all tile coords that are valid
+function getValidAdjecentTiles(x, y, tilemap) {
+  const startX = x;
+  const startY = y;
+
+  const validTiles = [];
+  const top = {
+    x: startX,
+    y: startY - 1,
+  };
+  const bottom = {
+    x: startX,
+    y: startY + 1,
+  };
+  const left = {
+    x: startX - 1,
+    y: startY,
+  };
+  const right = {
+    x: startX + 1,
+    y: startY,
+  };
+  // const top = [startX, startY - 1];
+  // const bottom = [startX, startY + 1];
+  // const left = [startX - 1, startY];
+  // const right = [startX + 1, startY];
+
+  if (inBounds(top.x, top.y, tilemap) && tilemap[top.y][top.x].id) {
+    validTiles.push(top);
+  }
+  if (inBounds(bottom.x, bottom.y, tilemap) && tilemap[bottom.y][bottom.x].id) {
+    validTiles.push(bottom);
+  }
+  if (inBounds(left.x, left.y, tilemap) && tilemap[left.y][left.x].id) {
+    validTiles.push(left);
+  }
+  if (inBounds(right.x, right.y, tilemap) && tilemap[right.y][right.x].id) {
+    validTiles.push(right);
+  }
+  return validTiles;
+}
 
 export const useStore = create(
   subscribeWithSelector((set) => ({
@@ -273,7 +321,8 @@ export const useStore = create(
         const validNum = validmap.reduce((acc, row) => {
           return row.reduce((acc, num) => acc + num, 0) + acc;
         }, 0);
-        console.table(validmap);
+        // console.table(validmap);
+        console.log({ validNum });
         return {
           validmap,
           tilemap,
