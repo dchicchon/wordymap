@@ -2,7 +2,6 @@ import Tile from '../Tile';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useStore } from '../../utils/store';
 import styles from './TilesBoard.module.css';
-// import { useEffect, useState } from 'react';
 
 export const TilesBoard = ({}) => {
   const tilemap = useStore((state) => state.tilemap);
@@ -12,26 +11,30 @@ export const TilesBoard = ({}) => {
   const removeFromTileRack = useStore((state) => state.removeFromTileRack);
   const removeTileFromMap = useStore((state) => state.removeTileFromMap);
   const addToTileRack = useStore((state) => state.addToTileRack);
+
   const onClick = (currentTile) => {
     if (selectedTile) {
       if (selectedTile.id === currentTile.id) {
+        console.log({ selectedTile });
         removeTileFromMap(selectedTile);
-        setSelectedTile(null);
         return;
-      } else {
-      }
-      if (selectedTile.index === 0 || selectedTile.index) {
+      } 
+      if (selectedTile.index >= 0) {
         removeFromTileRack(selectedTile.index);
         delete selectedTile.index;
-        if (currentTile.id) {
-          addToTileRack(currentTile);
-        }
       }
-      if (selectedTile.x && selectedTile.y) {
+      if (currentTile.id) {
+        removeTileFromMap(currentTile);
+      }
+      if (
+        selectedTile.x &&
+        selectedTile.x !== null &&
+        selectedTile.y &&
+        selectedTile.y !== null
+      ) {
         setTile(selectedTile.x, selectedTile.y, currentTile);
       }
       setTile(currentTile.x, currentTile.y, selectedTile);
-      setSelectedTile(null);
     } else if (currentTile.id) {
       setSelectedTile(currentTile);
     }
@@ -44,7 +47,6 @@ export const TilesBoard = ({}) => {
         const key = `${y}${x}`;
         const tile = tilemap[y][x];
         row.push(
-          // we can change the tilespace size here?
           <div className={styles.tile} onClick={(e) => onClick(tile)} key={key}>
             <Tile tile={tile} />
           </div>

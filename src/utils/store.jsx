@@ -1,28 +1,14 @@
 import { create } from 'zustand';
+import { wordObj } from './words';
+import { nanoid } from 'nanoid';
+// import { generatePerlinNoise } from 'perlin-noise';
+import q5js from 'q5xjs';
 import { subscribeWithSelector } from 'zustand/middleware';
 import Game from './Game';
 
+const sketchInstance = new q5js();
+sketchInstance.noiseSeed(1);
 
-// we will create a word object but only words in 3 letters in 
-// length will count
-const wordObj = {
-  HELLO: true,
-  AT: true,
-  IT: true,
-  TOO: true,
-  TOOT: true,
-  TO: true,
-  DO: true,
-  GO: true,
-  SO: true,
-  OF: true,
-  BE: true,
-  ME: true,
-  YOU: true,
-  QI: true,
-};
-
-// perhaps we should just bring this to zustand
 const Alpha = {
   alpha: '',
   rs: function (char, num) {
@@ -62,7 +48,29 @@ let alpha = Alpha.rs('E', 18)
   .rs('JKQXZ', 2)
   .s();
 
-const initialGame = new Game();
+function setupTiles() {
+  const gameTiles = [];
+  const remainingAlpha = alpha.slice().split('');
+  for (let i = 0; i < alpha.length; i++) {
+    const outputX = sketchInstance.noise(i);
+    const add = parseInt(outputX.toString()[5]);
+    const index = sketchInstance.floor(
+      sketchInstance.map(add, 0, 9, 0, remainingAlpha.length - 1)
+    );
+    const [letter] = remainingAlpha.splice(index, 1);
+    const tile = {
+      id: nanoid(),
+      x: null,
+      y: null,
+      letter,
+    };
+    gameTiles.push(tile);
+  }
+  return gameTiles;
+}
+
+const gameTiles = setupTiles();
+const initialGame = new Game(gameTiles);
 
 function inBounds(x, y, map) {
   if (x < 0 || x >= map.length) return false;
@@ -70,7 +78,7 @@ function inBounds(x, y, map) {
   return true;
 }
 
-function wordCheck(x, y, tilemap, validmap) {
+function wordCheck(x, y, tilemap, validmap, tilerackLength) {
   const startX = x;
   const startY = y;
   const startingTile = tilemap[startY][startX]; // starting tile
@@ -108,6 +116,7 @@ function wordCheck(x, y, tilemap, validmap) {
     const orientation = look[lookKey];
     const indicies = [];
     const startIndex = [startX, startY];
+
     indicies.push(startIndex);
     Object.keys(orientation).forEach((orientationKey) => {
       let insertPos = orientation[orientationKey];
@@ -117,15 +126,12 @@ function wordCheck(x, y, tilemap, validmap) {
       let currentY = startY;
 
       let iters = 0;
-      // BEFORE WHILE LOOP
       while (iters < 10) {
         if (lookKey === ORIENTATIONX) {
-          // currentX = update(currentX);
-          currentX = updateMap[insertPos](currentX);
+          currentX = update(currentX);
         }
         if (lookKey === ORIENTATIONY) {
-          // currentX = update(currentY);
-          currentX = updateMap[insertPos](currentX);
+          currentY = update(currentY);
         }
         // if out of bounds
         if (!inBounds(currentX, currentY, tilemap)) {
@@ -133,9 +139,7 @@ function wordCheck(x, y, tilemap, validmap) {
         }
 
         const nextTile = tilemap[currentY][currentX];
-        if (!nextTile.id) {
-          break;
-        }
+        if (!nextTile.id) break;
         const newIndex = [currentX, currentY]; // push position of this tile for later
         indicies.push(newIndex);
 
@@ -159,13 +163,15 @@ function wordCheck(x, y, tilemap, validmap) {
     }
   });
 
+  // if the player has no more letters in the rack
+  // they have won!
+
   // we're checking if we should add a new letter
   // if (this.tiles.length === 0 && this.validNum === this.totalTiles) {
   //   const copymap = JSON.parse(JSON.stringify(this.tilemap));
   //   const count = this.clustercount(x, y, copymap);
   //   if (count !== this.totalTiles) return;
   //   if (this.availableLetters.length === 0) {
-  //     console.log('You win!');
   //     return;
   //   }
   //   // const newTile = this.getRandomLetter();
@@ -184,7 +190,24 @@ function wordCheck(x, y, tilemap, validmap) {
 }
 
 // counting full system
-function clusterCount(x, y, map, memo = { sum: 0 }) {}
+function clusterCount(x, y, map, memo = { sum: 0 }) {
+  const char = map[y][x].id;
+  if (char) memo.sum += 1;
+  const emptyTile = {
+    letter: '',
+    index: null,
+    x,
+    y,
+  };
+  map[y][x] = emptyTile;
+  const validTiles = getValidAdjecentTiles(x, y, map);
+  if (validTiles.length > 0) {
+    validTiles.forEach((tile) => {
+      clusterCount(tile.x, tile.y, map, memo);
+    });
+  }
+  return memo.sum;
+}
 
 // get all tile coords that are valid
 function getValidAdjecentTiles(x, y, tilemap) {
@@ -208,10 +231,6 @@ function getValidAdjecentTiles(x, y, tilemap) {
     x: startX + 1,
     y: startY,
   };
-  // const top = [startX, startY - 1];
-  // const bottom = [startX, startY + 1];
-  // const left = [startX - 1, startY];
-  // const right = [startX + 1, startY];
 
   if (inBounds(top.x, top.y, tilemap) && tilemap[top.y][top.x].id) {
     validTiles.push(top);
@@ -228,9 +247,21 @@ function getValidAdjecentTiles(x, y, tilemap) {
   return validTiles;
 }
 
+function checkVictory(x, y, tilemap, tilesInPlay) {
+  // make sure that the count from the clustercount
+  // matches the total tiles in play
+  const copymap = tilemap.map(row => row.slice())
+  const count = clusterCount(x, y, copymap);
+  if (tilesInPlay === count) {
+    console.log('You win!')
+  }
+}
+
 export const useStore = create(
   subscribeWithSelector((set) => ({
+    tilesInPlay: initialGame.tilerack.length,
     tilemap: initialGame.tilemap,
+    availableTiles: initialGame.availableTiles,
     validmap: initialGame.validmap,
     validNum: 0,
     tilerack: initialGame.tilerack,
@@ -248,17 +279,20 @@ export const useStore = create(
       }),
     removeFromTileRack: (selectedIndex) =>
       set((state) => {
-        state.tilerack.splice(selectedIndex, 1);
+        const tilerack = state.tilerack.slice();
+        tilerack.splice(selectedIndex, 1);
         return {
-          tilerack: state.tilerack,
+          selectedTile: null,
+          tilerack,
           tilemapNum: state.tilemapNum + 1,
         };
       }),
     addToTileRack: (tile) =>
       set((state) => {
-        state.tilerack.push(tile);
+        const tilerack = state.tilerack.slice();
+        tilerack.push(tile);
         return {
-          tilerack: state.tilerack,
+          tilerack,
         };
       }),
     setTileRack: (rack) =>
@@ -277,7 +311,6 @@ export const useStore = create(
       set((state) => {
         const emptyTile = {
           letter: '',
-          valid: false,
           index: null,
           x,
           y,
@@ -287,46 +320,72 @@ export const useStore = create(
           tilemap: state.tilemap,
         };
       }),
-    setSelectedTile: (tile) =>
-      set(() => {
-        return { selectedTile: tile };
+    setSelectedTile: (pressedTile) =>
+      set((state) => {
+        if (state.selectedTile && pressedTile.id === state.selectedTile.id) {
+          return {
+            selectedTile: null,
+          };
+        }
+        console.log({selectedTile: pressedTile})
+        return {
+          selectedTile: pressedTile,
+        };
       }),
     removeTileFromMap: (tile) =>
       set((state) => {
+        const tilerack = state.tilerack.slice();
+        const tilemap = state.tilemap.map((row) => row.slice());
+        const validmap = state.validmap.map((row) => row.slice());
+
+        const { tilemapNum } = state;
         const emptyTile = {
           letter: '',
-          valid: false,
           x: tile.x,
           y: tile.y,
         };
-        state.tilemap[tile.y][tile.x] = emptyTile;
-        delete tile.x;
-        delete tile.y;
-        state.tilerack.push(tile);
+
+        // remove the validity and then run a check on the adjecent tiles
+        tilemap[tile.y][tile.x] = emptyTile;
+        validmap[tile.y][tile.x] = 0;
+
+        const validTiles = getValidAdjecentTiles(tile.x, tile.y, tilemap);
+        validTiles.forEach((validTile) => {
+          wordCheck(validTile.x, validTile.y, tilemap, validmap);
+        });
+
+        const newTile = {
+          letter: tile.letter,
+          id: tile.id,
+        }
+        tilerack.push(newTile);
         return {
-          tilerack: state.tilerack,
-          tilemap: state.tilemap,
-          tilemapNum: state.tilemapNum - 1,
+          selectedTile: null,
+          tilerack,
+          tilemap,
+          validmap,
+          tilemapNum: tilemapNum - 1,
         };
       }),
     setTile: (x, y, tile) =>
       set((state) => {
+        const tilerackLength = state.tilerack.length;
+        const tilemap = state.tilemap.map((row) => row.slice());
+        const validmap = state.validmap.map((row) => row.slice());
         const newTile = {
           ...tile,
           x,
           y,
         };
-        state.tilemap[y][x] = newTile;
-        const { validmap, tilemap } = wordCheck(x, y, state.tilemap, state.validmap);
-        const validNum = validmap.reduce((acc, row) => {
-          return row.reduce((acc, num) => acc + num, 0) + acc;
-        }, 0);
-        // console.table(validmap);
-        console.log({ validNum });
+        tilemap[y][x] = newTile;
+        const { validmap: newValidMap } = wordCheck(x, y, tilemap, validmap);
+        if (tilerackLength === 0) {
+          checkVictory(x, y, tilemap, state.tilesInPlay);
+        }
         return {
-          validmap,
+          selectedTile: null,
           tilemap,
-          validNum,
+          validmap: newValidMap,
         };
       }),
     addTilesPlaced: () =>
@@ -345,6 +404,22 @@ export const useStore = create(
         return {
           game: new Game(),
           gameNum: state.gameNum + 1,
+        };
+      }),
+    returnToPile: (selectedIndex) =>
+      set((state) => {
+        const tilerack = state.tilerack.slice();
+        const availableTiles = state.availableTiles.slice();
+        const [returnedTile] = tilerack.splice(selectedIndex, 1);
+        availableTiles.unshift(returnedTile);
+        for (let i = 0; i < 2; i++) {
+          tilerack.push(availableTiles.pop());
+        }
+        return {
+          selectedTile: null,
+          availableTiles,
+          tilerack,
+          tilesInPlay: state.tilesInPlay + 1,
         };
       }),
   }))

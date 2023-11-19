@@ -18,7 +18,6 @@ const Navbar = () => {
   const tilesPlaced = useStore((state) => state.tilesPlaced);
   const resetGame = useStore((state) => state.resetGame);
   useEffect(() => {
-    console.log('create navbar');
     const newTimer = setInterval(() => setTime((prevTime) => prevTime + 1), 1000);
     const resetTimer = () => {
       setTime(0);
@@ -29,10 +28,10 @@ const Navbar = () => {
 
   return (
     <div className={styles.navbar}>
-      <h4 className={styles.nav_element}>Wordymap</h4>
+      {/* <h4 className={styles.nav_element}>Wordymap</h4> */}
+      {/* <h4 className={styles.nav_element}>Reset</h4> */}
       <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
-      <h4 className={styles.nav_element}>Score: {tilesPlaced}</h4>
-      <h4 className={styles.nav_element}>Reset</h4>
+      {/* <h4 className={styles.nav_element}>Score: {tilesPlaced}</h4> */}
       {/* <button onClick={resetGame} className={styles.button}>
         Reset
       </button> */}

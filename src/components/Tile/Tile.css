@@ -8,10 +8,15 @@
   text-align: center;
   min-width: 30px;
   min-height: 30px;
+  transition: background-color 0.25s;
   /* line-height: 45px; */
   /* padding: 5px; */
   /* background-color: #1b1b1b; */
 }
 
+.tile:hover {
+  background-color: var(--color-secondary-lighten);
+  /* background-color: color-mix(in srgb, color percentage, color percentage) inherit; */
+}
 
 

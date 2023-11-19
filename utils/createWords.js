@@ -29,16 +29,14 @@ const skippedWords = [];
 console.log('run wordcheck');
 words.split('\n').forEach(word => {
     const parsedWord = word.replace(/(\r\n|\n|\r)/gm, "").toLowerCase();
-    console.log('Checking if profane:', word);
     if (matcher.hasMatch(parsedWord) || parsedWord.length < 3) {
-        console.log('skipping');
         skippedWords.push(parsedWord);
         return;
     }
-    obj[parsedWord] = true;
+    obj[parsedWord.toUpperCase()] = true;
 })
 
-console.log({ skippedWords });
+console.log({ skippedWordsLength: skippedWords.length });
 // lets create an obj with the wordArr
 const wordStr = JSON.stringify(obj);
 const str = `

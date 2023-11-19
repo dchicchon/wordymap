@@ -2,6 +2,14 @@ body,
 html,
 #root {
   background-color: #1a1a1a;
+  color:white;
   height: 100%;
   font-family: 'system-ui';
+  user-select: none;
+}
+
+:root {
+  --color-primary: #1a1a1a;
+  --color-secondary: #242424;
+  --color-secondary-lighten: #2d2d2d;
 }

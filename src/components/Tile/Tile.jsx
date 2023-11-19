@@ -22,45 +22,28 @@ const borderStyles = {
 };
 
 export const Tile = ({ tile }) => {
-  // const initSelectedTile = useStore((state) => state.selectedTile);
   const selectedTile = useStore((state) => state.selectedTile);
   const validmap = useStore((state) => state.validmap);
   const [border, setBorder] = useState(false);
 
   useEffect(() => {
+    // perhaps we should only re render if we have stuff?
+    // we need ot subscribe to validmap and selected tiles?
     if (selectedTile && selectedTile.id === tile.id) {
       setBorder('selected');
-    } else if (tile.y && tile.x && validmap[tile.y][tile.x]) {
+    } else if (
+      tile.y !== null &&
+      tile.y >= 0 &&
+      tile.x !== null &&
+      tile.x >= 0 &&
+      validmap[tile.y][tile.x]
+    ) {
       setBorder('valid');
     } else if (tile.id) {
       setBorder('default');
     } else {
       setBorder('noLetter');
     }
-
-    // const unsub = useStore.subscribe(
-    //   (state) => state.validNum,
-    //   (validNum) => {
-    //     console.log('validmap updated');
-    //     console.log({ validNum });
-    //   }
-    // );
-
-    // const unsub2 = useStore.subscribe(
-    //   (state) => state.selectedTile,
-    //   (selectedTile) => {
-    //     console.log('run the change');
-    //     if (selectedTile && selectedTile.id === tile.id) {
-    //       setBorder('selected');
-    //     } else if (tile.valid) {
-    //       setBorder('valid');
-    //     } else if (tile.id) {
-    //       setBorder('default');
-    //     } else {
-    //       setBorder('noLetter');
-    //     }
-    //   }
-    // );
 
     // return unsub2;
   }, [selectedTile, validmap]);

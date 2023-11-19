@@ -16,6 +16,8 @@
     "cuss": "^2.2.0",
     "nanoid": "^5.0.2",
     "obscenity": "^0.1.4",
+    "perlin-noise": "^0.0.1",
+    "q5xjs": "^0.0.5",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
