@@ -2,14 +2,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 10rem;
+  width: 90%;
+  margin: 0 auto;
+  /* padding: 0 10rem; */
   text-align: center;
 }
 
 .button {
   padding: 1rem;
   font-size: x-large;
-  width: 25%;
+  width: 10rem;
   border: 1px solid white;
   border-radius: 10px;
   color: white;
@@ -21,4 +23,12 @@
 
 .button:hover {
   background-color: var(--color-secondary-lighten);
+}
+
+.scores {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }

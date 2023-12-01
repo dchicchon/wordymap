@@ -15,8 +15,13 @@ const Home = () => {
   const [scores, setScores] = useState([]);
   useEffect(() => {
     console.log('get todays top 5 scores');
+    const scoreDate = localStorage.getItem('score-date');
+    const todaysDate = new Date().toLocaleDateString('en-US');
     const foundScores = localStorage.getItem('scores');
     const parsedScores = JSON.parse(foundScores);
+    if (scoreDate !== todaysDate) {
+      localStorage.setItem('score-date', todaysDate);
+    }
     const sortedScores = parsedScores.sort((a, b) => a - b).slice(0, 5);
     setScores(sortedScores);
   }, []);
@@ -33,7 +38,7 @@ const Home = () => {
         Play
       </Link>
       <h2>Today's High Scores</h2>
-      <ul style={{ listStyle: 'none' }}>
+      <ul className={styles.scores}>
         {scores && scores.map((score, i) => <li key={i}>{formatTime(score)}</li>)}
       </ul>
     </div>

@@ -1,13 +1,20 @@
 import { create } from 'zustand';
 import { wordObj } from './words';
 import { nanoid } from 'nanoid';
+import { noise, noiseSeed } from '@chriscourses/perlin-noise';
 // import { generatePerlinNoise } from 'perlin-noise';
-import q5js from 'q5xjs';
+// import PerlinNoise from 'perlin-noise-2d';
+// import q5js from 'q5xjs';
+
+// we should grab only the perlin noise from q5
 import { subscribeWithSelector } from 'zustand/middleware';
 import Game from './Game';
 
-const sketchInstance = new q5js();
-sketchInstance.noiseSeed(1);
+noiseSeed(1);
+// const sketchInstance = new q5js();
+
+// noise seed could be based on day?
+// sketchInstance.noiseSeed(1);
 
 const Alpha = {
   alpha: '',
@@ -48,15 +55,23 @@ let alpha = Alpha.rs('E', 18)
   .rs('JKQXZ', 2)
   .s();
 
+function map(value, start1, stop1, start2, stop2) {
+  const isInvalid = start1 > value || value > stop1;
+  if (isInvalid) {
+    throw Error('Provided value is out of bounds');
+  }
+  const mappedValue = ((value - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+  return mappedValue;
+}
+
 function setupTiles() {
   const gameTiles = [];
   const remainingAlpha = alpha.slice().split('');
   for (let i = 0; i < alpha.length; i++) {
-    const outputX = sketchInstance.noise(i);
+    const outputX = noise(i);
+    console.log({ outputX });
     const add = parseInt(outputX.toString()[5]);
-    const index = sketchInstance.floor(
-      sketchInstance.map(add, 0, 9, 0, remainingAlpha.length - 1)
-    );
+    const index = Math.floor(map(add, 0, 9, 0, remainingAlpha.length - 1));
     const [letter] = remainingAlpha.splice(index, 1);
     const tile = {
       id: nanoid(),
@@ -422,24 +437,13 @@ export const useStore = create(
             // check if we already have scores in the local storage
 
             const foundScores = localStorage.getItem('scores');
-            console.log({ foundScores });
-            // const scoreDate = localStorage.getItem('score-date');
             const todaysDate = new Date();
             if (foundScores) {
-              // if (scoreDate !== todaysDate.toLocaleDateString('en-US')) {
-              //   localStorage.removeItem('scores');
-              //   localStorage.setItem(
-              //     'score-date',
-              //     todaysDate.toLocaleDateString('en-US')
-              //   );
-              // }
               const parsedScores = JSON.parse(foundScores);
-              console.log({ parsedScores });
               parsedScores.push(state.time);
               localStorage.setItem('scores', JSON.stringify(parsedScores));
             } else {
               const newScores = JSON.stringify([state.time]);
-              console.log({ newScores });
               localStorage.setItem('scores', newScores);
               localStorage.setItem('score-date', todaysDate.toLocaleDateString('en-US'));
             }

@@ -1,10 +1,10 @@
+import { useEffect } from 'react';
 import TileRack from '../../components/TileRack';
 import TilesBoard from '../../components/TilesBoard';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './index.module.css';
 import { useStore } from '../../utils/store';
 import Modal from '../../components/Modal/Modal';
-import { useEffect } from 'react';
 
 const Game = () => {
   const gameWon = useStore((state) => state.gameWon);

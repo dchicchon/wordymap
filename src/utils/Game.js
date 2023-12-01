@@ -47,7 +47,7 @@ class Game {
     this.availableTiles = availableTiles
     this.totalTiles = 0;
     this.validNum = 0;
-    this.size = 25;
+    this.size = 20;
     this.tilerack = [];
     this.tilemap = [];
     this.validmap = [];

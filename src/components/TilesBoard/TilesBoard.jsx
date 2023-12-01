@@ -15,16 +15,13 @@ export const TilesBoard = ({}) => {
   const onClick = (currentTile) => {
     if (selectedTile) {
       if (selectedTile.id === currentTile.id) {
-        console.log({ selectedTile });
-        removeTileFromMap(selectedTile);
-        return;
-      } 
+        console.log('remove tile from board');
+        return removeTileFromMap(selectedTile);
+      }
       if (selectedTile.index >= 0) {
+        console.log('remove tile from tilerack');
         removeFromTileRack(selectedTile.index);
         delete selectedTile.index;
-      }
-      if (currentTile.id) {
-        removeTileFromMap(currentTile);
       }
       if (
         selectedTile.x &&
@@ -64,10 +61,15 @@ export const TilesBoard = ({}) => {
   return (
     <TransformWrapper
       doubleClick={{ disabled: true }}
+      minPositionX={0}
       centerZoomedOut={false}
-      initialScale={1.25}
+      initialScale={1.5}
     >
-      <TransformComponent>
+      <TransformComponent
+        wrapperStyle={{
+          width: '100%',
+        }}
+      >
         <div>{buildTileRows()}</div>
       </TransformComponent>
     </TransformWrapper>
