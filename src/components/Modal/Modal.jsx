@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-import styles from './Navbar.module.css';
 import { useStore } from '../../utils/store';
 import { useNavigate } from 'react-router-dom';
+import styles from './index.module.css';
 
 const formatTime = (totalSeconds) => {
   const remainingMinutes = Math.floor(totalSeconds / 60);
@@ -12,31 +11,33 @@ const formatTime = (totalSeconds) => {
   return timerDisplay;
 };
 
-const Navbar = () => {
+const Modal = () => {
   const time = useStore((state) => state.time);
-  const tick = useStore((state) => state.tick);
   const resetGame = useStore((state) => state.resetGame);
   const navigate = useNavigate();
-  const ready = useStore((state) => state.ready);
-  useEffect(() => {
-    if (!ready) return;
-    const interval = setInterval(tick, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [ready]);
 
-  const exitGame = () => {
+  const sendHome = () => {
     resetGame();
     navigate('/wordymap/');
   };
 
+  const playAgain = () => {
+    resetGame();
+  };
+  
+  const share = () => {
+    console.log('share');
+  }
+
   return (
-    <div className={styles.navbar}>
-      <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
-      <button onClick={exitGame}>Exit Game</button>
+    <div className={styles.modal}>
+      <h2>You win!</h2>
+      <h2>Final Time: {formatTime(time)}</h2>
+      <button onClick={playAgain}>Play Again</button>
+      <button onClick={sendHome}>Home</button>
+      <button onClick={share}>Share</button>
     </div>
   );
 };
 
-export default Navbar;
+export default Modal;

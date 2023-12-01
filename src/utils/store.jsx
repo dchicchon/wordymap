@@ -189,6 +189,14 @@ function wordCheck(x, y, tilemap, validmap, tilerackLength) {
   return { tilemap, validmap };
 }
 
+const formatTime = (totalSeconds) => {
+  const remainingMinutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+  const timerDisplay = `${String(remainingMinutes).padStart(2, '0')}:${String(
+    remainingSeconds
+  ).padStart(2, '0')}`;
+  return timerDisplay;
+};
 // counting full system
 function clusterCount(x, y, map, memo = { sum: 0 }) {
   const char = map[y][x].id;
@@ -250,15 +258,18 @@ function getValidAdjecentTiles(x, y, tilemap) {
 function checkVictory(x, y, tilemap, tilesInPlay) {
   // make sure that the count from the clustercount
   // matches the total tiles in play
-  const copymap = tilemap.map(row => row.slice())
+  const copymap = tilemap.map((row) => row.slice());
   const count = clusterCount(x, y, copymap);
   if (tilesInPlay === count) {
-    console.log('You win!')
+    console.log('You win!');
+    return true;
   }
+  return false;
 }
 
 export const useStore = create(
   subscribeWithSelector((set) => ({
+    gameWon: false,
     tilesInPlay: initialGame.tilerack.length,
     tilemap: initialGame.tilemap,
     availableTiles: initialGame.availableTiles,
@@ -270,7 +281,29 @@ export const useStore = create(
     game: initialGame,
     gameNum: 1,
     tilesPlaced: 0,
+    finalTime: 0,
     ready: false, // use this to show loading panel
+    time: 0,
+    startGame: () =>
+      set((state) => {
+        return {
+          ready: true,
+        };
+      }),
+    tick: (time) =>
+      set((state) => {
+        return {
+          time: state.time + 1,
+        };
+      }),
+    setFinalTime: (time) =>
+      set((state) => {
+        console.log('setFinalTime');
+        console.log({ time });
+        return {
+          finalTime: formatTime(time),
+        };
+      }),
     updateTileMapNum: (change) =>
       set((state) => {
         return {
@@ -327,7 +360,7 @@ export const useStore = create(
             selectedTile: null,
           };
         }
-        console.log({selectedTile: pressedTile})
+        // console.log({ selectedTile: pressedTile });
         return {
           selectedTile: pressedTile,
         };
@@ -357,7 +390,7 @@ export const useStore = create(
         const newTile = {
           letter: tile.letter,
           id: tile.id,
-        }
+        };
         tilerack.push(newTile);
         return {
           selectedTile: null,
@@ -379,11 +412,44 @@ export const useStore = create(
         };
         tilemap[y][x] = newTile;
         const { validmap: newValidMap } = wordCheck(x, y, tilemap, validmap);
+        let gameWon = false;
+        let ready = true;
         if (tilerackLength === 0) {
-          checkVictory(x, y, tilemap, state.tilesInPlay);
+          gameWon = checkVictory(x, y, tilemap, state.tilesInPlay);
+          if (gameWon) {
+            ready = false;
+
+            // check if we already have scores in the local storage
+
+            const foundScores = localStorage.getItem('scores');
+            console.log({ foundScores });
+            // const scoreDate = localStorage.getItem('score-date');
+            const todaysDate = new Date();
+            if (foundScores) {
+              // if (scoreDate !== todaysDate.toLocaleDateString('en-US')) {
+              //   localStorage.removeItem('scores');
+              //   localStorage.setItem(
+              //     'score-date',
+              //     todaysDate.toLocaleDateString('en-US')
+              //   );
+              // }
+              const parsedScores = JSON.parse(foundScores);
+              console.log({ parsedScores });
+              parsedScores.push(state.time);
+              localStorage.setItem('scores', JSON.stringify(parsedScores));
+            } else {
+              const newScores = JSON.stringify([state.time]);
+              console.log({ newScores });
+              localStorage.setItem('scores', newScores);
+              localStorage.setItem('score-date', todaysDate.toLocaleDateString('en-US'));
+            }
+          }
         }
+
         return {
           selectedTile: null,
+          gameWon,
+          ready,
           tilemap,
           validmap: newValidMap,
         };
@@ -401,9 +467,19 @@ export const useStore = create(
     resetGame: () =>
       set((state) => {
         // we might as well also
+        const gameTiles = setupTiles();
+        const newGame = new Game(gameTiles);
         return {
-          game: new Game(),
-          gameNum: state.gameNum + 1,
+          // gameNum: state.gameNum + 1,
+          game: newGame,
+          tilesInPlay: newGame.tilerack.length,
+          tilemap: newGame.tilemap,
+          availableTiles: newGame.availableTiles,
+          validmap: newGame.validmap,
+          tilerack: newGame.tilerack,
+          ready: false,
+          gameWon: false,
+          time: 0,
         };
       }),
     returnToPile: (selectedIndex) =>
