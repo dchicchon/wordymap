@@ -15,13 +15,16 @@ export const TilesBoard = ({}) => {
   const onClick = (currentTile) => {
     if (selectedTile) {
       if (selectedTile.id === currentTile.id) {
-        console.log('remove tile from board');
         return removeTileFromMap(selectedTile);
       }
       if (selectedTile.index >= 0) {
-        console.log('remove tile from tilerack');
         removeFromTileRack(selectedTile.index);
         delete selectedTile.index;
+        if (currentTile.id) {
+          // we could just remove the 
+          // lets remove the tile from the map and put back into board
+          addToTileRack(currentTile);
+        }
       }
       if (
         selectedTile.x &&
@@ -34,6 +37,8 @@ export const TilesBoard = ({}) => {
       setTile(currentTile.x, currentTile.y, selectedTile);
     } else if (currentTile.id) {
       setSelectedTile(currentTile);
+      // console.log('when does this run');
+      // removeTileFromMap(currentTile);
     }
   };
   const buildTileRows = () => {

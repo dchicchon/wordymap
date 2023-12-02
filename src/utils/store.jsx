@@ -69,7 +69,6 @@ function setupTiles() {
   const remainingAlpha = alpha.slice().split('');
   for (let i = 0; i < alpha.length; i++) {
     const outputX = noise(i);
-    console.log({ outputX });
     const add = parseInt(outputX.toString()[5]);
     const index = Math.floor(map(add, 0, 9, 0, remainingAlpha.length - 1));
     const [letter] = remainingAlpha.splice(index, 1);
@@ -93,7 +92,7 @@ function inBounds(x, y, map) {
   return true;
 }
 
-function wordCheck(x, y, tilemap, validmap, tilerackLength) {
+function wordCheck(x, y, tilemap, validmap) {
   const startX = x;
   const startY = y;
   const startingTile = tilemap[startY][startX]; // starting tile
@@ -155,6 +154,7 @@ function wordCheck(x, y, tilemap, validmap, tilerackLength) {
 
         const nextTile = tilemap[currentY][currentX];
         if (!nextTile.id) break;
+        console.log({ nextTile });
         const newIndex = [currentX, currentY]; // push position of this tile for later
         indicies.push(newIndex);
 
@@ -166,9 +166,14 @@ function wordCheck(x, y, tilemap, validmap, tilerackLength) {
 
     const validWord = wordObj[word];
     if (validWord) {
+      // lets double check each index
+      // we could double check the length of the word here
+      // and remove the indicies that are not valid
       firstWordValid = true;
       indicies.forEach(([x, y]) => {
-        validmap[y][x] = 1;
+        if (tilemap[y][x].letter) {
+          validmap[y][x] = 1;
+        }
       });
     } else {
       if (firstWordValid) indicies.shift(); // remove first index so we don't set it as invalid
@@ -178,29 +183,6 @@ function wordCheck(x, y, tilemap, validmap, tilerackLength) {
     }
   });
 
-  // if the player has no more letters in the rack
-  // they have won!
-
-  // we're checking if we should add a new letter
-  // if (this.tiles.length === 0 && this.validNum === this.totalTiles) {
-  //   const copymap = JSON.parse(JSON.stringify(this.tilemap));
-  //   const count = this.clustercount(x, y, copymap);
-  //   if (count !== this.totalTiles) return;
-  //   if (this.availableLetters.length === 0) {
-  //     return;
-  //   }
-  //   // const newTile = this.getRandomLetter();
-  //   const newTile = {
-  //     x: null,
-  //     y: null,
-  //     valid: false,
-  //     index: this.tiles.length,
-  //     letter: this.getRandomLetter(),
-  //   };
-  //   this.tiles.push(newTIle);
-  //   // this.addToTileRack(newTile);
-  //   this.totalTiles += 1;
-  // }
   return { tilemap, validmap };
 }
 
@@ -338,7 +320,10 @@ export const useStore = create(
     addToTileRack: (tile) =>
       set((state) => {
         const tilerack = state.tilerack.slice();
-        tilerack.push(tile);
+        tilerack.push({
+          letter: tile.letter,
+          id: tile.id,
+        });
         return {
           tilerack,
         };
@@ -375,7 +360,7 @@ export const useStore = create(
             selectedTile: null,
           };
         }
-        // console.log({ selectedTile: pressedTile });
+        console.log({ selectedTile: pressedTile });
         return {
           selectedTile: pressedTile,
         };
@@ -427,6 +412,7 @@ export const useStore = create(
         };
         tilemap[y][x] = newTile;
         const { validmap: newValidMap } = wordCheck(x, y, tilemap, validmap);
+        console.log({ newValidMap });
         let gameWon = false;
         let ready = true;
         if (tilerackLength === 0) {

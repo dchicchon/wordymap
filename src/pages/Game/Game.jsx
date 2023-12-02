@@ -12,7 +12,6 @@ const Game = () => {
   const startGame = useStore((state) => state.startGame);
 
   useEffect(() => {
-    console.log('load game component')
     startGame();
   }, []);
 
