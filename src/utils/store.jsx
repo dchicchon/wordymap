@@ -2,9 +2,6 @@ import { create } from 'zustand';
 import { wordObj } from './words';
 import { nanoid } from 'nanoid';
 import { noise, noiseSeed } from '@chriscourses/perlin-noise';
-// import { generatePerlinNoise } from 'perlin-noise';
-// import PerlinNoise from 'perlin-noise-2d';
-// import q5js from 'q5xjs';
 
 // we should grab only the perlin noise from q5
 import { subscribeWithSelector } from 'zustand/middleware';
@@ -12,7 +9,6 @@ import Game from './Game';
 
 noiseSeed(1);
 // const sketchInstance = new q5js();
-
 // noise seed could be based on day?
 // sketchInstance.noiseSeed(1);
 
@@ -154,7 +150,6 @@ function wordCheck(x, y, tilemap, validmap) {
 
         const nextTile = tilemap[currentY][currentX];
         if (!nextTile.id) break;
-        console.log({ nextTile });
         const newIndex = [currentX, currentY]; // push position of this tile for later
         indicies.push(newIndex);
 
@@ -216,6 +211,8 @@ function clusterCount(x, y, map, memo = { sum: 0 }) {
 
 // get all tile coords that are valid
 function getValidAdjecentTiles(x, y, tilemap) {
+  if (!x || !y) return [];
+
   const startX = x;
   const startY = y;
 
@@ -237,31 +234,46 @@ function getValidAdjecentTiles(x, y, tilemap) {
     y: startY,
   };
 
-  if (inBounds(top.x, top.y, tilemap) && tilemap[top.y][top.x].id) {
+  if (inBounds(top.x, top.y, tilemap) && tilemap[top.y] && tilemap[top.y][top.x].id) {
     validTiles.push(top);
   }
-  if (inBounds(bottom.x, bottom.y, tilemap) && tilemap[bottom.y][bottom.x].id) {
+  if (
+    inBounds(bottom.x, bottom.y, tilemap) &&
+    tilemap[bottom.y][bottom.x] &&
+    tilemap[bottom.y][bottom.x].id
+  ) {
     validTiles.push(bottom);
   }
-  if (inBounds(left.x, left.y, tilemap) && tilemap[left.y][left.x].id) {
+  if (
+    inBounds(left.x, left.y, tilemap) &&
+    tilemap[left.y][left.x] &&
+    tilemap[left.y][left.x].id
+  ) {
     validTiles.push(left);
   }
-  if (inBounds(right.x, right.y, tilemap) && tilemap[right.y][right.x].id) {
+  if (
+    inBounds(right.x, right.y, tilemap) &&
+    tilemap[right.y] &&
+    tilemap[right.y][right.x].id
+  ) {
     validTiles.push(right);
   }
   return validTiles;
 }
 
-function checkVictory(x, y, tilemap, tilesInPlay) {
-  // make sure that the count from the clustercount
-  // matches the total tiles in play
+function checkVictory(x, y, tilemap, validmap, tilesInPlay) {
   const copymap = tilemap.map((row) => row.slice());
-  const count = clusterCount(x, y, copymap);
-  if (tilesInPlay === count) {
-    console.log('You win!');
-    return true;
+
+  let validCount = 0;
+  for (let y = 0; y < validmap.length; y++) {
+    for (let x = 0; x < validmap[y].length; x++) {
+      const valid = validmap[y][x];
+      if (valid) {
+        validCount += 1;
+      }
+    }
   }
-  return false;
+  return tilesInPlay === clusterCount(x, y, copymap) && validCount === tilesInPlay;
 }
 
 export const useStore = create(
@@ -295,8 +307,6 @@ export const useStore = create(
       }),
     setFinalTime: (time) =>
       set((state) => {
-        console.log('setFinalTime');
-        console.log({ time });
         return {
           finalTime: formatTime(time),
         };
@@ -360,7 +370,6 @@ export const useStore = create(
             selectedTile: null,
           };
         }
-        console.log({ selectedTile: pressedTile });
         return {
           selectedTile: pressedTile,
         };
@@ -411,12 +420,18 @@ export const useStore = create(
           y,
         };
         tilemap[y][x] = newTile;
+
+        // lets run a wordcheck on the old position of the tile
+        const validTiles = getValidAdjecentTiles(tile.x, tile.y, tilemap);
+        validTiles.forEach((validTile) => {
+          wordCheck(validTile.x, validTile.y, tilemap, validmap);
+        });
+
         const { validmap: newValidMap } = wordCheck(x, y, tilemap, validmap);
-        console.log({ newValidMap });
         let gameWon = false;
         let ready = true;
         if (tilerackLength === 0) {
-          gameWon = checkVictory(x, y, tilemap, state.tilesInPlay);
+          gameWon = checkVictory(x, y, tilemap, validmap, state.tilesInPlay);
           if (gameWon) {
             ready = false;
 
