@@ -14,9 +14,9 @@
   /* background-color: #1b1b1b; */
 }
 
-.tile:hover {
-  background-color: var(--color-secondary-lighten);
+/* .tile:hover { */
+  /* background-color: var(--color-secondary-lighten); */
   /* background-color: color-mix(in srgb, color percentage, color percentage) inherit; */
-}
+/* } */
 
 

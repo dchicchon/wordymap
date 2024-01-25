@@ -26,31 +26,16 @@ const Modal = () => {
     resetGame();
   };
 
-  const share = () => {
-    console.log('share');
-    console.log({ validmap });
-
-    // find y bounds
-    const yTop = null;
-    const yBottom = null;
-
-    for (let y = 0; y < validmap.length; y++) {
-      for (let x = 0; x < validmap[y].length; y++) {
-        if (!isNaN(yTop) && !isNaN(yBottom)) {
-          break;
-        }
-      }
-    }
-  };
-
   return (
     <div className={styles.modal}>
-      <h2>You win!</h2>
-      <h2>Final Time: {formatTime(time)}</h2>
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-        <button onClick={playAgain}>Play Again</button>
-        <button onClick={sendHome}>Home</button>
-        <button onClick={share}>Share</button>
+      <div className={styles.shadow}></div>
+      <div className={styles.message}>
+        <h2>You win!</h2>
+        <h2>Final Time: {formatTime(time)}</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <button onClick={playAgain}>Play Again</button>
+          <button onClick={sendHome}>Home</button>
+        </div>
       </div>
     </div>
   );

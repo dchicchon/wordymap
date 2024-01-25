@@ -2,15 +2,15 @@ import { create } from 'zustand';
 import { wordObj } from './words';
 import { nanoid } from 'nanoid';
 import { noise, noiseSeed } from '@chriscourses/perlin-noise';
-
-// we should grab only the perlin noise from q5
 import { subscribeWithSelector } from 'zustand/middleware';
 import Game from './Game';
 
-noiseSeed(1);
-// const sketchInstance = new q5js();
-// noise seed could be based on day?
-// sketchInstance.noiseSeed(1);
+const date = new Date();
+date.setUTCHours(0);
+date.setUTCMinutes(0);
+date.setUTCSeconds(0);
+date.setUTCMilliseconds(0);
+noiseSeed(date.getTime());
 
 const Alpha = {
   alpha: '',
@@ -60,6 +60,7 @@ function map(value, start1, stop1, start2, stop2) {
   return mappedValue;
 }
 
+// const beta = 'TESTMT';
 function setupTiles() {
   const gameTiles = [];
   const remainingAlpha = alpha.slice().split('');
@@ -67,11 +68,10 @@ function setupTiles() {
     const outputX = noise(i);
     const add = parseInt(outputX.toString()[5]);
     const index = Math.floor(map(add, 0, 9, 0, remainingAlpha.length - 1));
+
     const [letter] = remainingAlpha.splice(index, 1);
     const tile = {
       id: nanoid(),
-      x: null,
-      y: null,
       letter,
     };
     gameTiles.push(tile);
@@ -178,7 +178,10 @@ function wordCheck(x, y, tilemap, validmap) {
     }
   });
 
-  return { tilemap, validmap };
+  return {
+    // tilemap,
+    validmap,
+  };
 }
 
 const formatTime = (totalSeconds) => {
@@ -359,8 +362,10 @@ export const useStore = create(
           y,
         };
         state.tilemap[y][x] = emptyTile;
+        state.validmap[y][x] = 0;
         return {
           tilemap: state.tilemap,
+          validmap: state.validmap,
         };
       }),
     setSelectedTile: (pressedTile) =>
@@ -411,9 +416,8 @@ export const useStore = create(
       }),
     setTile: (x, y, tile) =>
       set((state) => {
-        const tilerackLength = state.tilerack.length;
-        const tilemap = state.tilemap.map((row) => row.slice());
         const validmap = state.validmap.map((row) => row.slice());
+        const tilemap = state.tilemap.map((row) => row.slice());
         const newTile = {
           ...tile,
           x,
@@ -421,16 +425,30 @@ export const useStore = create(
         };
         tilemap[y][x] = newTile;
 
-        // lets run a wordcheck on the old position of the tile
-        const validTiles = getValidAdjecentTiles(tile.x, tile.y, tilemap);
-        validTiles.forEach((validTile) => {
-          wordCheck(validTile.x, validTile.y, tilemap, validmap);
+        if (!newTile.letter) {
+          validmap[y][x] = 0;
+        }
+
+        return {
+          selectedTile: null,
+          tilemap,
+          validmap,
+        };
+      }),
+
+    runWordCheck: (coords) =>
+      set((state) => {
+        const tilemap = state.tilemap.slice();
+        const tilerack = state.tilerack.slice();
+        const validmap = state.validmap.slice();
+        coords.forEach(([x, y]) => {
+          wordCheck(x, y, tilemap, validmap);
         });
 
-        const { validmap: newValidMap } = wordCheck(x, y, tilemap, validmap);
         let gameWon = false;
         let ready = true;
-        if (tilerackLength === 0) {
+        if (tilerack.length === 0) {
+          const [x, y] = coords[0];
           gameWon = checkVictory(x, y, tilemap, validmap, state.tilesInPlay);
           if (gameWon) {
             ready = false;
@@ -450,15 +468,14 @@ export const useStore = create(
             }
           }
         }
-
         return {
-          selectedTile: null,
+          tilemap,
+          validmap,
           gameWon,
           ready,
-          tilemap,
-          validmap: newValidMap,
         };
       }),
+
     addTilesPlaced: () =>
       set((state) => {
         return {
@@ -487,12 +504,39 @@ export const useStore = create(
           time: 0,
         };
       }),
-    returnToPile: (selectedIndex) =>
+    returnToPile: (selectedTile) =>
       set((state) => {
+        const tilemap = state.tilemap.slice();
         const tilerack = state.tilerack.slice();
         const availableTiles = state.availableTiles.slice();
-        const [returnedTile] = tilerack.splice(selectedIndex, 1);
-        availableTiles.unshift(returnedTile);
+        if (!isNaN(selectedTile.index)) {
+          const newRack = tilerack.filter((tile, index) => {
+            return index !== selectedTile.index;
+          });
+          const [returnedTile] = tilerack.splice(selectedTile.index, 1);
+          availableTiles.unshift(returnedTile);
+          for (let i = 0; i < 2; i++) {
+            newRack.push(availableTiles.pop());
+          }
+
+          return {
+            selectedTile: null,
+            availableTiles,
+            tilerack: newRack,
+            tilesInPlay: state.tilesInPlay + 1,
+          };
+        }
+
+        const { x, y } = selectedTile;
+        delete selectedTile.x;
+        delete selectedTile.y;
+        const emptyTile = {
+          letter: '',
+          x,
+          y,
+        };
+        tilemap[y][x] = emptyTile;
+        availableTiles.unshift(selectedTile);
         for (let i = 0; i < 2; i++) {
           tilerack.push(availableTiles.pop());
         }
@@ -501,6 +545,7 @@ export const useStore = create(
           availableTiles,
           tilerack,
           tilesInPlay: state.tilesInPlay + 1,
+          tilemap,
         };
       }),
   }))

@@ -16,11 +16,13 @@ const Game = () => {
   }, []);
 
   return (
-    <div className={styles.App}>
+    <div>
       {gameWon && finalTime !== null && <Modal />}
-      <Navbar />
-      <TilesBoard />
-      <TileRack />
+      <div className={styles.App}>
+        <Navbar />
+        <TilesBoard />
+        <TileRack />
+      </div>
     </div>
   );
 };

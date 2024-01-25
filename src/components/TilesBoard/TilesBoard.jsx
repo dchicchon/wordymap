@@ -11,6 +11,7 @@ export const TilesBoard = ({}) => {
   const removeFromTileRack = useStore((state) => state.removeFromTileRack);
   const removeTileFromMap = useStore((state) => state.removeTileFromMap);
   const addToTileRack = useStore((state) => state.addToTileRack);
+  const runWordCheck = useStore((state) => state.runWordCheck);
 
   const onClick = (currentTile) => {
     if (selectedTile) {
@@ -21,23 +22,22 @@ export const TilesBoard = ({}) => {
         removeFromTileRack(selectedTile.index);
         delete selectedTile.index;
         if (currentTile.id) {
-          // we could just remove the 
+          // we could just remove the
           // lets remove the tile from the map and put back into board
           addToTileRack(currentTile);
         }
       }
-      if (
-        selectedTile.x &&
-        selectedTile.x !== null &&
-        selectedTile.y &&
-        selectedTile.y !== null
-      ) {
+
+      const wordcheckCoords = [];
+      if (selectedTile && !isNaN(selectedTile.x) && !isNaN(selectedTile.y)) {
+        wordcheckCoords.push([selectedTile.x, selectedTile.y]);
         setTile(selectedTile.x, selectedTile.y, currentTile);
       }
+      wordcheckCoords.push([currentTile.x, currentTile.y]);
       setTile(currentTile.x, currentTile.y, selectedTile);
+      runWordCheck(wordcheckCoords);
     } else if (currentTile.id) {
       setSelectedTile(currentTile);
-      // console.log('when does this run');
       // removeTileFromMap(currentTile);
     }
   };

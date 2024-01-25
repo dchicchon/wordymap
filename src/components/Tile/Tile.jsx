@@ -12,10 +12,12 @@ const borderStyles = {
     borderRadius: '10px',
   },
   selected: {
+    // cursor: 'pointer',
     border: '1px solid yellow',
     borderRadius: '10px',
   },
   default: {
+    // cursor: 'pointer',
     border: '1px solid rgb(20, 157, 236)',
     borderRadius: '10px',
   },
@@ -27,11 +29,10 @@ export const Tile = ({ tile }) => {
   const [border, setBorder] = useState(false);
 
   useEffect(() => {
-    // perhaps we should only re render if we have stuff?
-    // we need ot subscribe to validmap and selected tiles?
     if (selectedTile && selectedTile.id === tile.id) {
       setBorder('selected');
     } else if (
+      tile.letter && 
       tile.y !== null &&
       tile.y >= 0 &&
       tile.x !== null &&
@@ -44,8 +45,6 @@ export const Tile = ({ tile }) => {
     } else {
       setBorder('noLetter');
     }
-
-    // return unsub2;
   }, [selectedTile, validmap]);
 
   return (

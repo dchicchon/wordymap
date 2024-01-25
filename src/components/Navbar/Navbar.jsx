@@ -32,9 +32,13 @@ const Navbar = () => {
   };
 
   return (
-    <div className={styles.navbar}>
-      <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
-      <button onClick={exitGame}>Exit Game</button>
+    <div>
+      {/* make this the same size as the navbar? */}
+      <div style={{ height: '5rem' }}></div>
+      <div className={styles.navbar}>
+        <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
+        <button onClick={exitGame}>Exit Game</button>
+      </div>
     </div>
   );
 };

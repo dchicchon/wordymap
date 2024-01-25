@@ -8,8 +8,12 @@ html,
   user-select: none;
 }
 
+p {
+  font-size: 1.25rem;
+}
+
 :root {
   --color-primary: #1a1a1a;
   --color-secondary: #242424;
-  --color-secondary-lighten: #2d2d2d;
+  --color-secondary-lighten: #262626;
 }

@@ -14,7 +14,6 @@ const formatTime = (totalSeconds) => {
 const Home = () => {
   const [scores, setScores] = useState([]);
   useEffect(() => {
-    console.log('get todays top 5 scores');
     const scoreDate = localStorage.getItem('score-date');
     const todaysDate = new Date().toLocaleDateString('en-US');
     const foundScores = localStorage.getItem('scores');
@@ -24,6 +23,7 @@ const Home = () => {
       setScores(sortedScores);
     }
     if (scoreDate !== todaysDate) {
+      localStorage.setItem('scores', JSON.stringify([]));
       localStorage.setItem('score-date', todaysDate);
     }
   }, []);
@@ -39,7 +39,7 @@ const Home = () => {
       <Link className={styles.button} to={'game'}>
         Play
       </Link>
-      <h2>Today's High Scores</h2>
+      <h2>Todays High Scores</h2>
       <ul className={styles.scores}>
         {scores && scores.map((score, i) => <li key={i}>{formatTime(score)}</li>)}
       </ul>

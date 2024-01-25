@@ -4,14 +4,15 @@ body {
 
 .App {
   display: flex;
-  /* height: 100%; */
+  flex-direction: column;
   width: 100%;
   color: white;
   background-color: #1a1a1a;
+  box-shadow: 0 0 0px;
 }
 
 button {
-  color:white;
+  color: white;
   border-radius: 8px;
   border: 1px solid white;
   padding: 0.6em 1.2em;

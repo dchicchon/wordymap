@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import Tile from '../Tile';
 import { useStore } from '../../utils/store';
 import styles from './TileRack.module.css';
@@ -23,7 +23,7 @@ export const TileRack = () => {
 
   const sendToPile = (e) => {
     if (!selectedTile) return;
-    returnToPile(selectedTile.index);
+    returnToPile(selectedTile);
   };
 
   const buildRack = (newRack) => {
@@ -44,11 +44,14 @@ export const TileRack = () => {
   };
 
   return (
-    <div id={styles.wrapper}>
-      <div id={styles.rack}>{rack}</div>
-      <div id={styles.toPile} onClick={sendToPile}>
-        <h2>Back To Pile</h2>
+    <div>
+      <div id={styles.wrapper}>
+        <div id={styles.rack}>{rack}</div>
+        <div id={styles.toPile} onClick={sendToPile}>
+          <h2>Back To Pile</h2>
+        </div>
       </div>
+      <div style={{ height: '5rem' }}></div>
     </div>
   );
 };
