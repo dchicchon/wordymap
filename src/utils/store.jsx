@@ -214,7 +214,7 @@ function clusterCount(x, y, map, memo = { sum: 0 }) {
 
 // get all tile coords that are valid
 function getValidAdjecentTiles(x, y, tilemap) {
-  if (!x || !y) return [];
+  if (isNaN(x) || isNaN(y)) return [];
 
   const startX = x;
   const startY = y;
@@ -276,7 +276,8 @@ function checkVictory(x, y, tilemap, validmap, tilesInPlay) {
       }
     }
   }
-  return tilesInPlay === clusterCount(x, y, copymap) && validCount === tilesInPlay;
+  const clusterNumber = clusterCount(x, y, copymap);
+  return tilesInPlay === clusterNumber && validCount === tilesInPlay;
 }
 
 export const useStore = create(
