@@ -2,7 +2,6 @@ import Tile from '../Tile';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useStore } from '../../utils/store';
 import styles from './TilesBoard.module.css';
-// import { useEffect, useState } from 'react';
 
 export const TilesBoard = ({}) => {
   const tilemap = useStore((state) => state.tilemap);
@@ -12,28 +11,34 @@ export const TilesBoard = ({}) => {
   const removeFromTileRack = useStore((state) => state.removeFromTileRack);
   const removeTileFromMap = useStore((state) => state.removeTileFromMap);
   const addToTileRack = useStore((state) => state.addToTileRack);
+  const runWordCheck = useStore((state) => state.runWordCheck);
+
   const onClick = (currentTile) => {
     if (selectedTile) {
       if (selectedTile.id === currentTile.id) {
-        removeTileFromMap(selectedTile);
-        setSelectedTile(null);
-        return;
-      } else {
+        return removeTileFromMap(selectedTile);
       }
-      if (selectedTile.index === 0 || selectedTile.index) {
+      if (selectedTile.index >= 0) {
         removeFromTileRack(selectedTile.index);
         delete selectedTile.index;
         if (currentTile.id) {
+          // we could just remove the
+          // lets remove the tile from the map and put back into board
           addToTileRack(currentTile);
         }
       }
-      if (selectedTile.x && selectedTile.y) {
+
+      const wordcheckCoords = [];
+      if (selectedTile && !isNaN(selectedTile.x) && !isNaN(selectedTile.y)) {
+        wordcheckCoords.push([selectedTile.x, selectedTile.y]);
         setTile(selectedTile.x, selectedTile.y, currentTile);
       }
+      wordcheckCoords.push([currentTile.x, currentTile.y]);
       setTile(currentTile.x, currentTile.y, selectedTile);
-      setSelectedTile(null);
+      runWordCheck(wordcheckCoords);
     } else if (currentTile.id) {
       setSelectedTile(currentTile);
+      // removeTileFromMap(currentTile);
     }
   };
   const buildTileRows = () => {
@@ -44,7 +49,6 @@ export const TilesBoard = ({}) => {
         const key = `${y}${x}`;
         const tile = tilemap[y][x];
         row.push(
-          // we can change the tilespace size here?
           <div className={styles.tile} onClick={(e) => onClick(tile)} key={key}>
             <Tile tile={tile} />
           </div>
@@ -62,10 +66,15 @@ export const TilesBoard = ({}) => {
   return (
     <TransformWrapper
       doubleClick={{ disabled: true }}
+      minPositionX={0}
       centerZoomedOut={false}
-      initialScale={1.25}
+      initialScale={1.5}
     >
-      <TransformComponent>
+      <TransformComponent
+        wrapperStyle={{
+          width: '100%',
+        }}
+      >
         <div>{buildTileRows()}</div>
       </TransformComponent>
     </TransformWrapper>

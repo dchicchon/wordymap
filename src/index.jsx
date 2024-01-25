@@ -3,10 +3,8 @@ import TilesBoard from './components/TilesBoard';
 import Navbar from './components/Navbar/Navbar';
 import styles from './index.module.css';
 
-// we should check the width of the screen were currently on
-// with that width, we can create the tilesizes on the board
 
-const App = () => {
+const Game = () => {
   return (
     <div className={styles.App}>
       <Navbar />
@@ -16,4 +14,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Game;

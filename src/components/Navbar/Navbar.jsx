@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import styles from './Navbar.module.css';
 import { useStore } from '../../utils/store';
+import { useNavigate } from 'react-router-dom';
 
-// should contain info about the game being played
 const formatTime = (totalSeconds) => {
   const remainingMinutes = Math.floor(totalSeconds / 60);
   const remainingSeconds = totalSeconds % 60;
@@ -13,29 +13,32 @@ const formatTime = (totalSeconds) => {
 };
 
 const Navbar = () => {
-  const [time, setTime] = useState(0);
-  const gameNum = useStore((state) => state.gameNum);
-  const tilesPlaced = useStore((state) => state.tilesPlaced);
+  const time = useStore((state) => state.time);
+  const tick = useStore((state) => state.tick);
   const resetGame = useStore((state) => state.resetGame);
+  const navigate = useNavigate();
+  const ready = useStore((state) => state.ready);
   useEffect(() => {
-    console.log('create navbar');
-    const newTimer = setInterval(() => setTime((prevTime) => prevTime + 1), 1000);
-    const resetTimer = () => {
-      setTime(0);
-      clearInterval(newTimer);
+    if (!ready) return;
+    const interval = setInterval(tick, 1000);
+    return () => {
+      clearInterval(interval);
     };
-    return resetTimer;
-  }, [gameNum]);
+  }, [ready]);
+
+  const exitGame = () => {
+    resetGame();
+    navigate('/wordymap/');
+  };
 
   return (
-    <div className={styles.navbar}>
-      <h4 className={styles.nav_element}>Wordymap</h4>
-      <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
-      <h4 className={styles.nav_element}>Score: {tilesPlaced}</h4>
-      <h4 className={styles.nav_element}>Reset</h4>
-      {/* <button onClick={resetGame} className={styles.button}>
-        Reset
-      </button> */}
+    <div>
+      {/* make this the same size as the navbar? */}
+      <div style={{ height: '5rem' }}></div>
+      <div className={styles.navbar}>
+        <h4 className={styles.nav_element}>Time: {formatTime(time)}</h4>
+        <button onClick={exitGame}>Exit Game</button>
+      </div>
     </div>
   );
 };

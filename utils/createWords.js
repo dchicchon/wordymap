@@ -1,26 +1,42 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { RegExpMatcher, DataSet, englishDataset, pattern } from 'obscenity'
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const fileName = __dirname + '/../src/utils/words.js'
-const wordspath = __dirname + '/../assets/words.txt'
-const badwordspath = __dirname + '/../assets/badwords.txt'
+const badwordsPath = __dirname + '/../assets/badwords.txt'
+const wordspath = __dirname + '/../assets/enable1.txt'
+
+const badWordsList = fs.readFileSync(badwordsPath).toString().split('\n')
+const customDataSet = new DataSet().addAll(englishDataset)
+badWordsList.forEach(word => {
+    customDataSet.addPhrase(phrase => {
+        return phrase.addPattern(pattern`|${word}|`)
+    })
+})
+const matcher = new RegExpMatcher({
+    ...customDataSet.build(),
+})
 
 const words = fs.readFileSync(wordspath).toString()
-const badwords = fs.readFileSync(badwordspath).toString().split('\n')
 const obj = {}
+
+const skippedWords = [];
+console.log('run wordcheck');
 words.split('\n').forEach(word => {
-    const clean = word.replace(/(\r\n|\n|\r)/gm, "");
-    if (!badwords.includes(clean.toLowerCase())) {
-        obj[clean] = true;
-    } else {
-        console.log('Skipping');
-        console.log(word);
+    const parsedWord = word.replace(/(\r\n|\n|\r)/gm, "").toLowerCase();
+    if (matcher.hasMatch(parsedWord) || parsedWord.length < 3) {
+        skippedWords.push(parsedWord);
+        return;
     }
+    obj[parsedWord.toUpperCase()] = true;
 })
+
+console.log({ skippedWordsLength: skippedWords.length });
 // lets create an obj with the wordArr
 const wordStr = JSON.stringify(obj);
 const str = `
