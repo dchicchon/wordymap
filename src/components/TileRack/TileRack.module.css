@@ -1,26 +1,10 @@
-#wrapper {
-  display: flex;
+#rack {
+  width: 100%;
+  border-top: 0.1px solid white;
+  background-color: var(--color-secondary);
   position: fixed;
   bottom: 0; /* Stick to the top of the page */
   left: 0;
-  /* border: 0.1px solid white; */
-  /* border-top-left-radius: 25px; */
-  /* border-top-right-radius: 25px; */
-  border-top: 0.1px solid white;
-  border-bottom: none;
-  background-color: var(--color-secondary);
-  transition: background-color 0.5s;
-  animation: fadein 1s;
-  /* width: 75%; */
-  width: 100%;
-  min-height: 50px;
-  /* bottom: 0px; */
-  /* border: 1px solid white; */
-  /* width: 100%; */
-  /* height: 10%; */
-}
-
-#rack {
   flex: 1;
   padding: 10px;
   display: flex;
@@ -29,46 +13,6 @@
   align-items: center;
   gap: 15px;
   border-right: 1px solid white;
-}
-
-#toPile {
-  flex: 0.5;
-  padding: 10px;
-  align-items: center;
-  cursor: pointer;
-  background-color: var(--color-secondary);
-  transition: background-color 0.25s;
-  text-align: center;
-}
-
-#toPile:hover {
-  background-color: var(--color-secondary-lighten);
-}
-
-/* the size of this should be based on the screen width */
-/* maybe we should do the same thing for our tileboard */
-
-.tile {
-  user-select: none;
-  background-color: inherit;
-  width: calc(100vw / 32);
-  height: calc(100vw / 32);
-}
-
-@media screen and (max-width: 600px) {
-  .tile {
-    width: calc(100vw / 10);
-    height: calc(100vw / 10);
-  }
-}
-
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 #tilerack::-webkit-scrollbar {

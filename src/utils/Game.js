@@ -24,7 +24,9 @@ class Game {
       map[y] = [];
       for (let x = 0; x < this.size; x++) {
         const emptyTile = {
+          // dont need an id i think?
           letter: '',
+          loc: 'map',
           x,
           y,
         };

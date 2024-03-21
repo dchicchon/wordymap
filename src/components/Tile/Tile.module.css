@@ -1,0 +1,29 @@
+.tile {
+  cursor: pointer;
+  font-size: 25px;
+  user-select: none;
+  display: inline-block;
+  text-align: center;
+  width: var(--tile-size);
+  min-width: var(--tile-size);
+  max-width: var(--tile-size);
+  height: var(--tile-size);
+  transition: background-color 0.25s;
+  box-sizing: border-box;
+}
+
+.emptyTile {
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 25px;
+  user-select: none;
+  display: inline-block;
+  text-align: center;
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
+  width: var(--tile-size);
+  height: var(--tile-size);
+  max-width: var(--tile-size);
+  transition: background-color 0.25s;
+  border: 0.1px solid white;
+}

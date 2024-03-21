@@ -2,17 +2,19 @@ body,
 html,
 #root {
   background-color: #1a1a1a;
-  color:white;
+  color: white;
   height: 100%;
   font-family: 'system-ui';
   user-select: none;
 }
 
-p {
-  font-size: 1.25rem;
+p,
+li {
+  font-size: 1.5rem;
 }
 
 :root {
+  --tile-size: 40px;
   --color-primary: #1a1a1a;
   --color-secondary: #242424;
   --color-secondary-lighten: #262626;

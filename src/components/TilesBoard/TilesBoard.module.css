@@ -25,24 +25,15 @@
   display: flex;
 }
 
-.tile {
-  user-select: none;
-  color: white;
-  width: calc(100vw / 32);
-  height: calc(100vw / 32);
-  padding: 5px;
-  background-color: #1a1a1a;
-  border: 0.1px solid rgb(133, 133, 133);
-  transition: background-color 0.25s;
+.boardwrapper {
+  animation: fadein 0.5s forwards;
 }
 
-@media screen and (max-width: 600px) {
-  .tile {
-    width: calc(100vw / 10);
-    height: calc(100vw / 10);
+@keyframes fadein {
+  from {
+    opacity: 0;
   }
-}
-
-.tile:hover {
-  /* background-color: #292828; */
+  to {
+    opacity: 100%;
+  }
 }
