@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import icon from '../../assets/pwa192.png';
 import styles from './index.module.css';
 
 const formatTime = (totalSeconds) => {
@@ -29,12 +30,24 @@ const Home = () => {
   }, []);
   return (
     <div className={styles.page}>
-      <h1>Wordy</h1>
+      <div
+        style={{
+          paddingTop: 50,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 10,
+          justifyContent: 'center',
+        }}
+      >
+        <img src={icon} height={100} width={100} />
+        <h1>Wordy</h1>
+      </div>
       <h2>About</h2>
       <p>
         Get rid of all your tiles in the fastest time by building words with 3 letters or
-        more! If you have a letter you can't use, send it back to the pile to get 2 new
-        letters to use.
+        more. If you have a letter you can't use, send it back to the pile by double
+        clicking the letter in the rack.
       </p>
       <Link className={styles.button} to={'game'}>
         Play

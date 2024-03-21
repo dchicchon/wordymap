@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { wordObj } from './words';
+// import { wordObj } from './words';
 import { nanoid } from 'nanoid';
 import { noise, noiseSeed } from '@chriscourses/perlin-noise';
 import { subscribeWithSelector } from 'zustand/middleware';
@@ -73,6 +73,7 @@ function setupTiles() {
     const tile = {
       id: nanoid(),
       letter,
+      loc: 'rack',
     };
     gameTiles.push(tile);
   }
@@ -88,46 +89,45 @@ function inBounds(x, y, map) {
   return true;
 }
 
-function wordCheck(x, y, tilemap, validmap) {
+let wcCount = 0;
+function wordCheck(x, y, tilemap, validmap, wordObj) {
+  console.log('wordcheck', wcCount++);
   const startX = x;
   const startY = y;
-  const startingTile = tilemap[startY][startX]; // starting tile
-  const ORIENTATIONX = 'ORIENTATIONX';
-  const ORIENTATIONY = 'ORIENTATIONY';
-  const BEHIND = 'BEHIND';
-  const AHEAD = 'AHEAD';
+  const startingTile = tilemap[startY][startX];
 
-  const look = {
-    [ORIENTATIONX]: {
-      left: BEHIND,
-      right: AHEAD,
+  const directions = {
+    ORIENTATIONX: {
+      left: 'BEHIND',
+      right: 'AHEAD',
     },
-    [ORIENTATIONY]: {
-      up: BEHIND,
-      down: AHEAD,
+    ORIENTATIONY: {
+      up: 'BEHIND',
+      down: 'AHEAD',
     },
   };
 
   const updateMap = {
-    [BEHIND]: (val) => val - 1,
-    [AHEAD]: (val) => val + 1,
+    BEHIND: (val) => val - 1,
+    AHEAD: (val) => val + 1,
   };
 
   const insertMap = {
-    [BEHIND]: (letter, word) => letter.concat(word),
-    [AHEAD]: (letter, word) => word.concat(letter),
+    BEHIND: (letter, word) => letter.concat(word),
+    AHEAD: (letter, word) => word.concat(letter),
   };
 
   let firstWordValid = false;
 
-  // Go through x or y
-  Object.keys(look).forEach((lookKey) => {
-    let word = startingTile.letter; // add to the front or back of this word while we go
-    const orientation = look[lookKey];
-    const indicies = [];
-    const startIndex = [startX, startY];
+  Object.keys(directions).forEach((lookKey) => {
+    console.log('Checking:', lookKey);
+    // Start building a word for each direction
+    let word = startingTile.letter;
+    const orientation = directions[lookKey];
+    const startingCoord = [startX, startY];
+    const coords = [startingCoord];
 
-    indicies.push(startIndex);
+    console.log('starting coords', ...coords);
     Object.keys(orientation).forEach((orientationKey) => {
       let insertPos = orientation[orientationKey];
       const update = updateMap[insertPos];
@@ -136,52 +136,46 @@ function wordCheck(x, y, tilemap, validmap) {
       let currentY = startY;
 
       let iters = 0;
-      while (iters < 10) {
-        if (lookKey === ORIENTATIONX) {
+      const maxIterations = 50;
+      while (iters < maxIterations) {
+        if (lookKey === 'ORIENTATIONX') {
           currentX = update(currentX);
         }
-        if (lookKey === ORIENTATIONY) {
+        if (lookKey === 'ORIENTATIONY') {
           currentY = update(currentY);
         }
-        // if out of bounds
-        if (!inBounds(currentX, currentY, tilemap)) {
-          break;
-        }
+
+        if (!inBounds(currentX, currentY, tilemap)) break;
 
         const nextTile = tilemap[currentY][currentX];
-        if (!nextTile.id) break;
-        const newIndex = [currentX, currentY]; // push position of this tile for later
-        indicies.push(newIndex);
+        if (!nextTile.letter) break;
 
-        // word = insertMap[insertPos];
+        const newIndex = [currentX, currentY];
+        coords.push(newIndex);
+
         word = insert(nextTile.letter, word);
         iters++;
       }
     });
 
+    console.log('end coords', ...coords);
+    console.log('created word', word);
     const validWord = wordObj[word];
     if (validWord) {
-      // lets double check each index
-      // we could double check the length of the word here
-      // and remove the indicies that are not valid
+      console.log({ validWord, word });
       firstWordValid = true;
-      indicies.forEach(([x, y]) => {
+      coords.forEach(([x, y]) => {
         if (tilemap[y][x].letter) {
           validmap[y][x] = 1;
         }
       });
     } else {
-      if (firstWordValid) indicies.shift(); // remove first index so we don't set it as invalid
-      indicies.forEach(([x, y]) => {
+      if (firstWordValid) coords.shift(); // remove first index so we don't set it as invalid
+      coords.forEach(([x, y]) => {
         validmap[y][x] = 0;
       });
     }
   });
-
-  return {
-    // tilemap,
-    validmap,
-  };
 }
 
 const formatTime = (totalSeconds) => {
@@ -192,13 +186,13 @@ const formatTime = (totalSeconds) => {
   ).padStart(2, '0')}`;
   return timerDisplay;
 };
-// counting full system
+
 function clusterCount(x, y, map, memo = { sum: 0 }) {
   const char = map[y][x].id;
   if (char) memo.sum += 1;
+  // setting it to empty to ensure that we've counted it
   const emptyTile = {
     letter: '',
-    index: null,
     x,
     y,
   };
@@ -212,7 +206,6 @@ function clusterCount(x, y, map, memo = { sum: 0 }) {
   return memo.sum;
 }
 
-// get all tile coords that are valid
 function getValidAdjecentTiles(x, y, tilemap) {
   if (isNaN(x) || isNaN(y)) return [];
 
@@ -281,7 +274,8 @@ function checkVictory(x, y, tilemap, validmap, tilesInPlay) {
 }
 
 export const useStore = create(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
+    devMode: import.meta.env.MODE === 'development',
     gameWon: false,
     tilesInPlay: initialGame.tilerack.length,
     tilemap: initialGame.tilemap,
@@ -297,12 +291,16 @@ export const useStore = create(
     finalTime: 0,
     ready: false, // use this to show loading panel
     time: 0,
-    startGame: () =>
-      set((state) => {
+    wordObj: {},
+    startGame: async () => {
+      const { wordObj } = await import('./words');
+      return set(() => {
         return {
+          wordObj,
           ready: true,
         };
-      }),
+      });
+    },
     tick: (time) =>
       set((state) => {
         return {
@@ -315,16 +313,66 @@ export const useStore = create(
           finalTime: formatTime(time),
         };
       }),
+    getValidAdjecentTiles: (x, y) => {
+      const tilemap = get().tilemap;
+      if (isNaN(x) || isNaN(y)) return [];
+
+      const startX = x;
+      const startY = y;
+
+      const validTiles = [];
+      const top = {
+        x: startX,
+        y: startY - 1,
+      };
+      const bottom = {
+        x: startX,
+        y: startY + 1,
+      };
+      const left = {
+        x: startX - 1,
+        y: startY,
+      };
+      const right = {
+        x: startX + 1,
+        y: startY,
+      };
+
+      if (inBounds(top.x, top.y, tilemap) && tilemap[top.y] && tilemap[top.y][top.x].id) {
+        validTiles.push(top);
+      }
+      if (
+        inBounds(bottom.x, bottom.y, tilemap) &&
+        tilemap[bottom.y][bottom.x] &&
+        tilemap[bottom.y][bottom.x].id
+      ) {
+        validTiles.push(bottom);
+      }
+      if (
+        inBounds(left.x, left.y, tilemap) &&
+        tilemap[left.y][left.x] &&
+        tilemap[left.y][left.x].id
+      ) {
+        validTiles.push(left);
+      }
+      if (
+        inBounds(right.x, right.y, tilemap) &&
+        tilemap[right.y] &&
+        tilemap[right.y][right.x].id
+      ) {
+        validTiles.push(right);
+      }
+      return validTiles;
+    },
     updateTileMapNum: (change) =>
       set((state) => {
         return {
           tilemapNum: state.tilemapNum + change,
         };
       }),
-    removeFromTileRack: (selectedIndex) =>
+    removeTileFromRack: (id) =>
       set((state) => {
-        const tilerack = state.tilerack.slice();
-        tilerack.splice(selectedIndex, 1);
+        const tilerack = state.tilerack.slice().filter((tile) => tile.id !== id);
         return {
           selectedTile: null,
           tilerack,
@@ -337,6 +385,8 @@ export const useStore = create(
         tilerack.push({
           letter: tile.letter,
           id: tile.id,
+          loc: 'rack',
+          index: tilerack.length,
         });
         return {
           tilerack,
@@ -361,6 +411,7 @@ export const useStore = create(
           index: null,
           x,
           y,
+          loc: 'map',
         };
         state.tilemap[y][x] = emptyTile;
         state.validmap[y][x] = 0;
@@ -369,28 +420,24 @@ export const useStore = create(
           validmap: state.validmap,
         };
       }),
-    setSelectedTile: (pressedTile) =>
-      set((state) => {
-        if (state.selectedTile && pressedTile.id === state.selectedTile.id) {
-          return {
-            selectedTile: null,
-          };
-        }
-        return {
-          selectedTile: pressedTile,
-        };
-      }),
-    removeTileFromMap: (tile) =>
-      set((state) => {
+    setSelectedTile: (pressedTile) => {
+      console.log({ pressedTile });
+      return set({ selectedTile: pressedTile });
+    },
+    removeTileFromMap: (tile) => {
+      console.log('removeTileFromMap');
+      // we can run a get for the wordobj
+      const { wordObj } = get();
+      return set((state) => {
         const tilerack = state.tilerack.slice();
-        const tilemap = state.tilemap.map((row) => row.slice());
+        const tilemap = state.tilemap.map((row) => row.slice()); // need this method to properly get tiles
         const validmap = state.validmap.map((row) => row.slice());
-
         const { tilemapNum } = state;
         const emptyTile = {
           letter: '',
           x: tile.x,
           y: tile.y,
+          loc: 'map',
         };
 
         // remove the validity and then run a check on the adjecent tiles
@@ -399,13 +446,15 @@ export const useStore = create(
 
         const validTiles = getValidAdjecentTiles(tile.x, tile.y, tilemap);
         validTiles.forEach((validTile) => {
-          wordCheck(validTile.x, validTile.y, tilemap, validmap);
+          wordCheck(validTile.x, validTile.y, tilemap, validmap, wordObj);
         });
 
         const newTile = {
           letter: tile.letter,
           id: tile.id,
+          loc: 'rack',
         };
+        console.log({ tilemap });
         tilerack.push(newTile);
         return {
           selectedTile: null,
@@ -414,7 +463,8 @@ export const useStore = create(
           validmap,
           tilemapNum: tilemapNum - 1,
         };
-      }),
+      });
+    },
     setTile: (x, y, tile) =>
       set((state) => {
         const validmap = state.validmap.map((row) => row.slice());
@@ -423,6 +473,7 @@ export const useStore = create(
           ...tile,
           x,
           y,
+          loc: 'map',
         };
         tilemap[y][x] = newTile;
 
@@ -437,13 +488,14 @@ export const useStore = create(
         };
       }),
 
-    runWordCheck: (coords) =>
-      set((state) => {
-        const tilemap = state.tilemap.slice();
-        const tilerack = state.tilerack.slice();
-        const validmap = state.validmap.slice();
+    runWordCheck: (coords) => {
+      const { wordObj, tilemap, tilerack, validmap } = get();
+      return set((state) => {
+        // const tilemap = state.tilemap.slice();
+        // const tilerack = state.tilerack.slice();
+        // const validmap = state.validmap.slice();
         coords.forEach(([x, y]) => {
-          wordCheck(x, y, tilemap, validmap);
+          wordCheck(x, y, tilemap, validmap, wordObj);
         });
 
         let gameWon = false;
@@ -475,8 +527,8 @@ export const useStore = create(
           gameWon,
           ready,
         };
-      }),
-
+      });
+    },
     addTilesPlaced: () =>
       set((state) => {
         return {
@@ -505,48 +557,25 @@ export const useStore = create(
           time: 0,
         };
       }),
-    returnToPile: (selectedTile) =>
+    returnToPile: (selectedIndex) =>
       set((state) => {
-        const tilemap = state.tilemap.slice();
         const tilerack = state.tilerack.slice();
         const availableTiles = state.availableTiles.slice();
-        if (!isNaN(selectedTile.index)) {
-          const newRack = tilerack.filter((tile, index) => {
-            return index !== selectedTile.index;
-          });
-          const [returnedTile] = tilerack.splice(selectedTile.index, 1);
-          availableTiles.unshift(returnedTile);
-          for (let i = 0; i < 2; i++) {
-            newRack.push(availableTiles.pop());
-          }
-
-          return {
-            selectedTile: null,
-            availableTiles,
-            tilerack: newRack,
-            tilesInPlay: state.tilesInPlay + 1,
-          };
-        }
-
-        const { x, y } = selectedTile;
-        delete selectedTile.x;
-        delete selectedTile.y;
-        const emptyTile = {
-          letter: '',
-          x,
-          y,
-        };
-        tilemap[y][x] = emptyTile;
-        availableTiles.unshift(selectedTile);
+        const newRack = tilerack.filter((tile, index) => {
+          return index !== selectedIndex;
+        });
+        const [returnedTile] = tilerack.splice(selectedIndex, 1);
+        availableTiles.unshift(returnedTile);
         for (let i = 0; i < 2; i++) {
-          tilerack.push(availableTiles.pop());
+          const newTile = availableTiles.pop();
+          newRack.push(newTile);
         }
+
         return {
           selectedTile: null,
           availableTiles,
-          tilerack,
+          tilerack: newRack,
           tilesInPlay: state.tilesInPlay + 1,
-          tilemap,
         };
       }),
   }))

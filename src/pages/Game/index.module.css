@@ -3,6 +3,7 @@ body {
 }
 
 .App {
+  touch-action: manipulation;
   display: flex;
   flex-direction: column;
   width: 100%;

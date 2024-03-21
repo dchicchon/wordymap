@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/wordymap/dev-sw.js?dev-sw', { scope: '/wordymap/', type: 'classic' })
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/wordymap/dev-sw.js?dev-sw', { scope: '/wordymap/', type: 'classic' })

@@ -11,8 +11,12 @@ const Game = () => {
   const finalTime = useStore((state) => state.finalTime);
   const startGame = useStore((state) => state.startGame);
 
+  const start = async () => {
+    await startGame();
+  };
+
   useEffect(() => {
-    startGame();
+    start();
   }, []);
 
   return (
