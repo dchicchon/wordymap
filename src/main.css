@@ -14,7 +14,8 @@ li {
 }
 
 :root {
-  --tile-size: 50px;
+  --tile-size: 75px;
+  --border-size: 1px;
   --color-primary: #1a1a1a;
   --color-secondary: #242424;
   --color-secondary-lighten: #262626;

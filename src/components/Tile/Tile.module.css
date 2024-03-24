@@ -1,8 +1,10 @@
 .tile {
   cursor: pointer;
-  font-size: 25px;
   user-select: none;
-  display: inline-block;
+  /* display: inline-block; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   width: var(--tile-size);
   min-width: var(--tile-size);
@@ -10,6 +12,12 @@
   height: var(--tile-size);
   transition: background-color 0.25s;
   box-sizing: border-box;
+}
+
+.tile > p {
+  user-select: none;
+  margin: 0;
+  font-size: 35px;
 }
 
 .emptyTile {

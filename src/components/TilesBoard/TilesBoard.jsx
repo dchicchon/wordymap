@@ -29,7 +29,7 @@ export const TilesBoard = ({}) => {
     <TransformWrapper
       doubleClick={{ disabled: true }}
       centerOnInit
-      minPositionY={500}
+      limitToBounds={false}
       centerZoomedOut={false}
       initialScale={1.5}
       initialPositionY={0}

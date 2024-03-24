@@ -5,18 +5,18 @@ import styles from './Tile.module.css';
 
 const borderStyles = {
   noLetter: {
-    border: '1px solid transparent',
+    border: '3px solid transparent',
   },
   valid: {
-    border: '1px solid #1eff1e',
+    border: '3px solid #1eff1e',
     borderRadius: '10px',
   },
   selected: {
-    border: '1px solid yellow',
+    border: '3px solid yellow',
     borderRadius: '10px',
   },
   default: {
-    border: '1px solid rgb(20, 157, 236)',
+    border: '3px solid rgb(20, 157, 236)',
     borderRadius: '10px',
   },
 };
@@ -153,8 +153,7 @@ export const Tile = ({ tile, index }) => {
           {tile.x},{tile.y}
         </div>
       )}
-
-      {tile.letter}
+      <p>{tile.letter}</p>
     </div>
   );
 };
